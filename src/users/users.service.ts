@@ -1,26 +1,77 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { User } from './entities/user.entity';
+import { IUser } from './interface/users.interface';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+  public async create(createUserDto: CreateUserDto): Promise<IUser> {
+    try {
+      return await this.userRepository.save(createUserDto);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
+  }
+  public async findById(userId: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException(`User #${userId} not found`);
+    }
+    return user;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  public async findByEmail(email: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException(`User #${email} not found`);
+    }
+
+    return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  public async updateUser(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({ id: +id });
+      user.name = updateUserDto.name;
+      user.email = updateUserDto.email;
+      user.username = updateUserDto.username;
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+      return await this.userRepository.save(user);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
   }
+  public async updatePassword(email: string, password: string): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({ email: email });
+      user.password = bcrypt.hashSync(password, 8);
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+      return await this.userRepository.save(user);
+    } catch (err) {
+      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+    }
   }
 }
