@@ -6,28 +6,33 @@ import { IUser } from './../users/interface/users.interface';
 import { MailerService } from '../mailer/mailer.service';
 import { JwtService } from '@nestjs/jwt';
 
-
 @Injectable()
 export class RegisterService {
   constructor(
     private readonly usersService: UsersService,
     private readonly mailerService: MailerService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
-  public async register(registerUserDto: RegisterUserDto): Promise<IUser | string> {
-    const userbyEmail = await this.usersService.findByEmail(registerUserDto.email);
-    const userbyUsername = await this.usersService.findByUsername(registerUserDto.username);
+  public async register(
+    registerUserDto: RegisterUserDto,
+  ): Promise<IUser | string> {
+    const userByEmail = await this.usersService.findByEmail(
+      registerUserDto.email,
+    );
+    const userByUsername = await this.usersService.findByUsername(
+      registerUserDto.username,
+    );
 
-    if (userbyEmail) return `existingEmail`;
-    if (userbyUsername) return `existingUsername`;
+    if (userByEmail) return `existingEmail`;
+    if (userByUsername) return `existingUsername`;
 
     registerUserDto.password = bcrypt.hashSync(registerUserDto.password, 8);
     const payload = {
-      username: registerUserDto.username,
-      email: registerUserDto.email
+      email: registerUserDto.email,
     };
     const confirmToken = this.jwtService.sign(payload);
+    console.log(confirmToken);
     const link = `localhost:3000/auth/register/${confirmToken}`;
     this.sendMailConfirm(registerUserDto, link);
 
@@ -39,14 +44,13 @@ export class RegisterService {
       .sendMail({
         to: user.email,
         from: 'from@example.com',
-        subject: 'Confirm registation',
-        text: 'Confirm registation!',
+        subject: 'Confirm registration',
+        text: 'Confirm registration!',
         template: 'index',
         context: {
-          title: 'Confirm registationly',
+          title: 'Confirm registration',
           link,
-          description:
-            `In order to complete registation please click Confirm`,
+          description: `In order to complete registration please click Confirm`,
           nameUser: user.name,
         },
       })

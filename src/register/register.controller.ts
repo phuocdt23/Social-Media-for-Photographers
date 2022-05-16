@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Res, HttpStatus, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  HttpStatus,
+  Get,
+  Param,
+} from '@nestjs/common';
 import { RegisterService } from './register.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -6,7 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('auth')
 @Controller('auth/register')
 export class RegisterController {
-  constructor(private readonly registerService: RegisterService) { }
+  constructor(private readonly registerService: RegisterService) {}
 
   @Post()
   public async register(
@@ -28,9 +36,9 @@ export class RegisterController {
         });
       }
       return res.status(HttpStatus.OK).json({
-          message: 'User registration successfully!',
-          status: 200,
-        });
+        message: 'User registration successfully!',
+        status: 200,
+      });
     } catch (err) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: 'Error: User not registration!',
@@ -39,8 +47,6 @@ export class RegisterController {
     }
   }
 
-  @Get(':token')
-  public async handleConfirmation(@Res() res, @Param() token): Promise<any> {
-
-  }
+  // @Get(':token')
+  // public async handleConfirmation(@Res() res, @Param() token): Promise<any> {}
 }

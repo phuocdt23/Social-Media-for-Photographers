@@ -10,8 +10,10 @@ import { PhotosModule } from './photos/photos.module';
 import { PostsModule } from './posts/posts.module';
 import { RegisterModule } from './register/register.module';
 import { MailerModule } from './mailer/mailer.module';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
     TypeOrmModule.forRoot(),
     UsersModule,
     AlbumsModule,

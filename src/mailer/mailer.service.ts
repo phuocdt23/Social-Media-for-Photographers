@@ -10,11 +10,11 @@ export class MailerService {
 
   constructor(private readonly configService: ConfigService) {
     this.nodemailerTransport = createTransport({
-      host: "smtp.mailtrap.io",
-      port: 2525,
+      host: this.configService.get<string>('EMAIL_HOST'),
+      port: this.configService.get<string>('EMAIL_PORT'),
       auth: {
-        user: "18ee6f0fcd6d45",
-        pass: "951eb9110dc7ae"
+        user: this.configService.get<string>('EMAIL_AUTH_USER'),
+        pass: this.configService.get<string>('EMAIL_AUTH_PASSWORD'),
       },
       logger: false,
     });
