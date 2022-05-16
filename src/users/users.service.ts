@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -36,7 +31,7 @@ export class UsersService {
   public async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: {
-        email: email
+        email: email,
       },
     });
     return user;

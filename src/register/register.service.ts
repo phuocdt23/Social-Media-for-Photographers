@@ -58,10 +58,10 @@ export class RegisterService {
           nameUser: user.name,
         },
       })
-      .then((response) => {
+      .then(() => {
         console.log('User Registration: Send Mail Confirmation successfully!');
       })
-      .catch((err) => {
+      .catch(() => {
         console.log('User Registration: Send Mail Confirmation Failed!');
       });
   }

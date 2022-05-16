@@ -28,10 +28,3 @@ import { JwtModule } from '@nestjs/jwt';
   providers: [RegisterService, UsersService],
 })
 export class RegisterModule {}
-
-// {
-//   "email": "email01@gmail.com",
-//   "username": "user001",
-//   "name": "phuoc12",
-//   "password": "123123"
-// }

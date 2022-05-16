@@ -50,9 +50,7 @@ export class RegisterController {
   @Get(':token')
   public async handleConfirmation(@Res() res, @Param() token): Promise<any> {
     try {
-      const rs = await this.registerService.confirmEmailRegistration(
-        token.token,
-      );
+      await this.registerService.confirmEmailRegistration(token.token);
       return res.status(HttpStatus.OK).json({
         message: 'Confirm Email Registration Successfully!',
         status: 200,
