@@ -5,10 +5,15 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { IUser } from './../users/interface/users.interface';
 import { MailerService } from '../mailer/mailer.service';
 import { JwtService } from '@nestjs/jwt';
+import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RegisterService {
   constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private readonly usersService: UsersService,
     private readonly mailerService: MailerService,
     private readonly jwtService: JwtService,
@@ -32,7 +37,6 @@ export class RegisterService {
       email: registerUserDto.email,
     };
     const confirmToken = this.jwtService.sign(payload);
-    console.log(confirmToken);
     const link = `localhost:3000/auth/register/${confirmToken}`;
     this.sendMailConfirm(registerUserDto, link);
 
@@ -55,36 +59,42 @@ export class RegisterService {
         },
       })
       .then((response) => {
-        console.log(response);
         console.log('User Registration: Send Mail Confirmation successfully!');
       })
       .catch((err) => {
-        console.log(err);
         console.log('User Registration: Send Mail Confirmation Failed!');
       });
   }
-  // private sendMailConfirmation(user, token): void {
-  //   this.mailerService
-  //     .sendMail({
-  //       to: user.email,
-  //       from: 'from@example.com',
-  //       subject: 'Registration successful ✔',
-  //       text: 'Registration successful!',
-  //       template: 'index',
-  //       context: {
-  //         title: 'Registration successfully',
-  //         description:
-  //           "You did it! You registered!, You're successfully registered.✔",
-  //         nameUser: user.name,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       console.log(response);
-  //       console.log('User Registration: Send Mail successfully!');
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       console.log('User Registration: Send Mail Failed!');
-  //     });
-  // }
+  public async confirmEmailRegistration(token: string): Promise<any> {
+    const { email } = this.jwtService.verify(token);
+    const user = await this.usersService.findByEmail(email);
+    user.isConfirmed = true;
+    this.sendMailRegisterSuccessfully(user);
+    return await this.userRepository.save(user);
+  }
+
+  private sendMailRegisterSuccessfully(user): void {
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        from: 'from@example.com',
+        subject: 'Registration successful ✔',
+        text: 'Registration successful!',
+        template: 'index',
+        context: {
+          title: 'Registration successfully',
+          description:
+            "You did it! You registered!, You're successfully registered.✔",
+          nameUser: user.name,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log('User Registration: Send Mail successfully!');
+      })
+      .catch((err) => {
+        console.log(err);
+        console.log('User Registration: Send Mail Failed!');
+      });
+  }
 }

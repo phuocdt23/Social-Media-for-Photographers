@@ -47,6 +47,22 @@ export class RegisterController {
     }
   }
 
-  // @Get(':token')
-  // public async handleConfirmation(@Res() res, @Param() token): Promise<any> {}
+  @Get(':token')
+  public async handleConfirmation(@Res() res, @Param() token): Promise<any> {
+    try {
+      const rs = await this.registerService.confirmEmailRegistration(
+        token.token,
+      );
+      return res.status(HttpStatus.OK).json({
+        message: 'Confirm Email Registration Successfully!',
+        status: 200,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Fail To Confirm Email Registration!',
+        status: 400,
+      });
+    }
+  }
 }
