@@ -8,7 +8,8 @@ import { CommentsModule } from './comments/comments.module';
 import { FollowersModule } from './followers/followers.module';
 import { PhotosModule } from './photos/photos.module';
 import { PostsModule } from './posts/posts.module';
-
+import { RegisterModule } from './register/register.module';
+import { MailerModule } from './mailer/mailer.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
@@ -18,6 +19,8 @@ import { PostsModule } from './posts/posts.module';
     FollowersModule,
     PhotosModule,
     PostsModule,
+    RegisterModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

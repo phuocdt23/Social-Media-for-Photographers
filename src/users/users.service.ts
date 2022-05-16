@@ -24,28 +24,29 @@ export class UsersService {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
   }
-  public async findById(userId: string): Promise<User> {
+  public async findById(userId: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: {
         id: userId,
       },
     });
-    if (!user) {
-      throw new NotFoundException(`User #${userId} not found`);
-    }
     return user;
   }
 
   public async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: {
-        email: email,
+        email: email
       },
     });
-    if (!user) {
-      throw new NotFoundException(`User #${email} not found`);
-    }
-
+    return user;
+  }
+  public async findByUsername(username: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: {
+        username: username,
+      },
+    });
     return user;
   }
 
