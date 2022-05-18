@@ -36,7 +36,7 @@ export class RegisterController {
         });
       }
       return res.status(HttpStatus.OK).json({
-        message: 'User registration successfully!',
+        message: 'You need to check your mail to confirm registration!',
         status: 200,
       });
     } catch (err) {
@@ -48,9 +48,12 @@ export class RegisterController {
   }
 
   @Get(':token')
-  public async handleConfirmation(@Res() res, @Param() token): Promise<any> {
+  public async handleConfirmation(
+    @Res() res,
+    @Param('token') token,
+  ): Promise<any> {
     try {
-      await this.registerService.confirmEmailRegistration(token.token);
+      await this.registerService.confirmEmailRegistration(token);
       return res.status(HttpStatus.OK).json({
         message: 'Confirm Email Registration Successfully!',
         status: 200,

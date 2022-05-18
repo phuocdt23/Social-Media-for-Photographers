@@ -11,6 +11,7 @@ import { PostsModule } from './posts/posts.module';
 import { RegisterModule } from './register/register.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ConfigModule } from '@nestjs/config';
+import { LoginModule } from './login/login.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
@@ -23,6 +24,7 @@ import { ConfigModule } from '@nestjs/config';
     PostsModule,
     RegisterModule,
     MailerModule,
+    LoginModule,
   ],
   controllers: [AppController],
   providers: [AppService],

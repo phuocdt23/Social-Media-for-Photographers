@@ -37,6 +37,7 @@ export class RegisterService {
       email: registerUserDto.email,
     };
     const confirmToken = this.jwtService.sign(payload);
+    console.log(confirmToken);
     const link = `localhost:3000/auth/register/${confirmToken}`;
     this.sendMailConfirm(registerUserDto, link);
 
