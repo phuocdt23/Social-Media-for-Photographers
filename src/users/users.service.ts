@@ -60,11 +60,26 @@ export class UsersService {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
   }
-  public async updatePassword(email: string, password: string): Promise<User> {
+  public async updateByPassword(
+    email: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<any> {
     try {
+      if (oldPassword === newPassword)
+        return {
+          message: 'Your password not changed yet',
+          status: 409,
+        };
       const user = await this.userRepository.findOne({ email: email });
-      user.password = bcrypt.hashSync(password, 8);
-
+      const passwordIsValid = bcrypt.compareSync(oldPassword, user.password);
+      if (!passwordIsValid == true) {
+        return {
+          message: 'Invalid password',
+          status: 403,
+        };
+      }
+      user.password = bcrypt.hashSync(newPassword, 8);
       return await this.userRepository.save(user);
     } catch (err) {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
