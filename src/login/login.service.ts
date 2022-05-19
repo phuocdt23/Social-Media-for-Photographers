@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import { JwtPayload } from './interfaces/jwt.payload';
+// import { JwtPayload } from './interfaces/jwt.payload';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class LoginService {
 
         if (!passwordIsValid == true) {
           return {
-            message: 'Authentication failed. Wrong password',
+            message: 'Invalid password',
             status: 400,
           };
         }
@@ -69,26 +69,26 @@ export class LoginService {
       });
   }
 
-  public async validateUserByJwt(payload: JwtPayload) {
-    // This will be used when the user has already logged in and has a JWT
-    const user = await this.usersService.findByEmail(payload.email);
+  // public async validateUserByJwt(payload: JwtPayload) {
+  //   // This will be used when the user has already logged in and has a JWT
+  //   const user = await this.usersService.findByEmail(payload.email);
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return this.createJwtPayload(user);
-  }
+  //   if (!user) {
+  //     throw new UnauthorizedException();
+  //   }
+  //   return this.createJwtPayload(user);
+  // }
 
-  protected createJwtPayload(user) {
-    const data: JwtPayload = {
-      email: user.email,
-    };
+  // protected createJwtPayload(user) {
+  //   const data: JwtPayload = {
+  //     email: user.email,
+  //   };
 
-    const jwt = this.jwtService.sign(data);
+  //   const jwt = this.jwtService.sign(data);
 
-    return {
-      expiresIn: 3600,
-      token: jwt,
-    };
-  }
+  //   return {
+  //     expiresIn: 3600,
+  //     token: jwt,
+  //   };
+  // }
 }

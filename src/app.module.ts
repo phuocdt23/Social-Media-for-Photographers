@@ -13,6 +13,7 @@ import { MailerModule } from './mailer/mailer.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoginModule } from './login/login.module';
 import { ChangePasswordModule } from './change-password/change-password.module';
+import { ForgotPasswordModule } from './forgot-password/forgot-password.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
@@ -27,6 +28,7 @@ import { ChangePasswordModule } from './change-password/change-password.module';
     MailerModule,
     LoginModule,
     ChangePasswordModule,
+    ForgotPasswordModule,
   ],
   controllers: [AppController],
   providers: [AppService],
