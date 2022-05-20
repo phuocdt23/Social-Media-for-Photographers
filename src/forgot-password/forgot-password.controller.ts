@@ -12,7 +12,7 @@ export class ForgotPasswordController {
   public async forgotPassword(
     @Res() res,
     @Body() forgotPasswordDto: ForgotPasswordDto,
-  ): Promise<any> {
+  ) {
     const rs = await this.forgotPasswordService.forgotPassword(
       forgotPasswordDto,
     );

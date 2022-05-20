@@ -5,8 +5,8 @@ import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'Follower' })
 export class Follower {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
   @Column({ name: 'followerId' })
   followerId!: number;
 

@@ -11,7 +11,7 @@ import { Comment } from '../../comments/entities/comment.entity';
 import { User } from '../../users/entities/user.entity';
 @Entity({ name: 'Post' })
 export class Post {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @ApiProperty()
@@ -25,10 +25,6 @@ export class Post {
   @ApiProperty()
   @Column({ nullable: false, default: 0 })
   like: number;
-
-  @ApiProperty()
-  @Column({ nullable: false, default: 0 })
-  dislike: number;
 
   @ApiProperty()
   @Column({ default: true })

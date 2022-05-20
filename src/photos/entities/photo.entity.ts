@@ -4,8 +4,8 @@ import { User } from '../../users/entities/user.entity';
 import { Album } from '../../albums/entities/album.entity';
 @Entity({ name: 'Photo' })
 export class Photo {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ApiProperty()
   @Column({ nullable: false })

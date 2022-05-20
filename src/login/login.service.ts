@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -27,7 +28,7 @@ export class LoginService {
     return this.validate(loginDto)
       .then((userData) => {
         if (!userData) {
-          throw new UnauthorizedException();
+          throw new NotFoundException('Wrong Email!');
         }
         if (!userData.isConfirmed) {
           return {
@@ -68,27 +69,4 @@ export class LoginService {
         throw new HttpException(err, HttpStatus.BAD_REQUEST);
       });
   }
-
-  // public async validateUserByJwt(payload: JwtPayload) {
-  //   // This will be used when the user has already logged in and has a JWT
-  //   const user = await this.usersService.findByEmail(payload.email);
-
-  //   if (!user) {
-  //     throw new UnauthorizedException();
-  //   }
-  //   return this.createJwtPayload(user);
-  // }
-
-  // protected createJwtPayload(user) {
-  //   const data: JwtPayload = {
-  //     email: user.email,
-  //   };
-
-  //   const jwt = this.jwtService.sign(data);
-
-  //   return {
-  //     expiresIn: 3600,
-  //     token: jwt,
-  //   };
-  // }
 }

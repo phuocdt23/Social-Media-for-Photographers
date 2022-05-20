@@ -19,7 +19,7 @@ export class UsersService {
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
     }
   }
-  public async findById(userId: number): Promise<User> {
+  public async findById(userId: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: {
         id: userId,
@@ -46,11 +46,11 @@ export class UsersService {
   }
 
   public async updateUser(
-    id: number,
+    id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<User> {
     try {
-      const user = await this.userRepository.findOne({ id: +id });
+      const user = await this.userRepository.findOne({ id: id });
       user.name = updateUserDto.name;
       user.email = updateUserDto.email;
       user.username = updateUserDto.username;

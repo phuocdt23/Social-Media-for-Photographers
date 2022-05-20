@@ -11,7 +11,7 @@ import {
   import { Post } from '../../posts/entities/post.entity';
   @Entity({ name: 'Comment' })
   export class Comment {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: number;
   
     @ApiProperty()

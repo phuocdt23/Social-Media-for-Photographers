@@ -2,34 +2,25 @@ import {
   Controller,
   Get,
   Body,
-  Param,
   Put,
   Res,
   HttpStatus,
   NotFoundException,
   UnauthorizedException,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { JwtService } from '@nestjs/jwt';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
-  ) {}
-
-  @Get(':token')
-  public async getUser(
-    @Res() res,
-    @Param('token') token: string,
-  ): Promise<any> {
+  constructor(private readonly usersService: UsersService) {}
+  @Get()
+  public async getUser(@Res() res, @Req() req): Promise<any> {
     try {
-      const encodedData = this.jwtService.verify(token);
-      console.log(encodedData);
-      const user = await this.usersService.findById(encodedData.id);
+      const user = await this.usersService.findById(req.user.id);
 
       if (!user) {
         throw new NotFoundException('User does not exist!');
@@ -44,16 +35,15 @@ export class UsersController {
     }
   }
 
-  @Put(':token')
+  @Put()
   public async update(
     @Res() res,
-    @Param('token') token: string,
+    @Req() req,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<any> {
     try {
-      const encodedData = this.jwtService.verify(token);
       const result = await this.usersService.updateUser(
-        encodedData.id,
+        req.user.id,
         updateUserDto,
       );
       return res.status(HttpStatus.OK).json({
