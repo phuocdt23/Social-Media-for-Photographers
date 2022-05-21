@@ -8,24 +8,25 @@ import {
   Delete,
   Req,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Controller('albums')
+@ApiTags('albums')
 @ApiBearerAuth()
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
   create(@Body() createAlbumDto: CreateAlbumDto, @Req() req) {
-    return this.albumsService.create(createAlbumDto, req.user.id);
+    return this.albumsService.create(createAlbumDto, req.user);
   }
 
   @Get()
-  findAll() {
-    return this.albumsService.findAll();
+  findAll(@Req() req) {
+    return this.albumsService.findAll(req.user);
   }
 
   @Get(':id')

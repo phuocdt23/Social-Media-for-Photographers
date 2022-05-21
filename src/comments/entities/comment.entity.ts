@@ -14,7 +14,6 @@ import {
     @PrimaryGeneratedColumn('uuid')
     id: number;
   
-    @ApiProperty()
     @Column({ nullable: false })
     content: string;
   

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Column,
   Entity,
@@ -9,24 +8,23 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import { Photo } from '../../photos/entities/photo.entity';
 import { User } from 'src/users/entities/user.entity';
 enum Status {
   Public = 'Public',
   Private = 'Private',
 }
-@ApiTags('Album')
 @Entity({ name: 'Album' })
 export class Album {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty()
+  @Column({ nullable: false })
+  ownerId: string;
+
   @Column({ nullable: false })
   name: string;
 
-  @ApiProperty()
   @Column({ nullable: false })
   description: string;
 

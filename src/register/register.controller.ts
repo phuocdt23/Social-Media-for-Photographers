@@ -50,7 +50,7 @@ export class RegisterController {
   @Get(':token')
   public async handleConfirmation(
     @Res() res,
-    @Param('token') token,
+    @Param('token') token: string,
   ): Promise<any> {
     try {
       await this.registerService.confirmEmailRegistration(token);
