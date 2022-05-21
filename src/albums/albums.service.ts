@@ -11,8 +11,6 @@ export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private readonly albumsRepository: Repository<Album>, // private readonly usersService: UsersService,
-    @InjectRepository(Album)
-    private readonly usersRository: Repository<User>, // private readonly usersService: UsersService,
   ) { }
   public async create(createAlbumDto: CreateAlbumDto, user: User): Promise<Album> {
     try {
