@@ -47,6 +47,6 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtVerifyMiddleware).forRoutes('users', 'albums');
+    consumer.apply(JwtVerifyMiddleware).forRoutes('users', 'albums', 'photos');
   }
 }

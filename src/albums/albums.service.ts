@@ -11,8 +11,11 @@ export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private readonly albumsRepository: Repository<Album>, // private readonly usersService: UsersService,
-  ) { }
-  public async create(createAlbumDto: CreateAlbumDto, user: User): Promise<Album> {
+  ) {}
+  public async create(
+    createAlbumDto: CreateAlbumDto,
+    user: User,
+  ): Promise<Album> {
     try {
       const album = new Album();
       album.name = createAlbumDto.name;
@@ -29,7 +32,7 @@ export class AlbumsService {
     try {
       const albums = await this.albumsRepository.find({
         select: ['id', 'name', 'description'],
-        where: { ownerId: user.id }
+        where: { ownerId: user.id },
       });
       return albums;
     } catch (error) {
@@ -44,8 +47,18 @@ export class AlbumsService {
       throw new Error();
     }
   }
+  public async findById(id: string): Promise<Album> {
+    try {
+      return await this.albumsRepository.findOne(id);
+    } catch (error) {
+      throw new Error();
+    }
+  }
 
-  public async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
+  public async update(
+    id: string,
+    updateAlbumDto: UpdateAlbumDto,
+  ): Promise<Album> {
     try {
       const album = await this.findOne(id);
       album.name = updateAlbumDto.name;
