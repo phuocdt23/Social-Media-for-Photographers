@@ -16,7 +16,7 @@ export class LoginService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   private async validate(loginDto: LoginDto): Promise<any> {
     return await this.usersService.findByEmail(loginDto.email);
@@ -24,18 +24,17 @@ export class LoginService {
 
   public async login(
     loginDto: LoginDto,
-  ): Promise<any | { status: number; message: string }> {
+  ): Promise<any> {
     return this.validate(loginDto)
       .then((userData) => {
         if (!userData) {
           throw new NotFoundException('Wrong Email!');
         }
+
         if (!userData.isConfirmed) {
-          return {
-            message:
-              'Your account is not confirmed yet, please check your mail',
-            status: 400,
-          };
+          throw new UnauthorizedException(
+          'Your account is not confirmed yet, please check your mail');
+
         }
 
         const passwordIsValid = bcrypt.compareSync(
@@ -44,10 +43,7 @@ export class LoginService {
         );
 
         if (!passwordIsValid == true) {
-          return {
-            message: 'Invalid password',
-            status: 400,
-          };
+          throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
         }
 
         const payload = {
@@ -62,11 +58,7 @@ export class LoginService {
           expiresIn: 3600,
           accessToken: accessToken,
           user: payload,
-          status: 200,
         };
       })
-      .catch((err) => {
-        throw new HttpException(err, HttpStatus.BAD_REQUEST);
-      });
   }
 }

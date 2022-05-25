@@ -5,6 +5,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { Photo } from './entities/photo.entity';
+import * as fs from 'fs';
 @Injectable()
 export class PhotosService {
   constructor(
@@ -15,7 +16,7 @@ export class PhotosService {
   async create(user: User, albumId, data) {
     try {
       const album = await this.albumsService.findById(albumId);
-      if(!album){
+      if (!album) {
         return new Error('album do not exist');
       }
       const photo = new Photo();
@@ -29,19 +30,46 @@ export class PhotosService {
     }
   }
 
-  findAll() {
-    return `This action returns all photos`;
+  async findAll(user: User): Promise<Photo[]> {
+    try {
+      return await this.photosRepository.find({
+        select: ['id', 'name', 'link'],
+        where: { user: user }
+      })
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findAllOfAlbum(albumId: string): Promise<Photo[]> {
+    try {
+      const album = await this.albumsService.findById(albumId);
+      return await this.photosRepository.find({
+        select: ['id', 'name', 'link'],
+        where: { album: album }
+      })
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} photo`;
+  async findOne(id: string) {
+    return await this.photosRepository.findOne({ id });
   }
 
-  update(id: number, updatePhotoDto: UpdatePhotoDto) {
-    return `This action updates a #${id} photo`;
+  async update(id: string, updatePhotoDto: UpdatePhotoDto) {
+    const photo = await this.photosRepository.findOne({ id });
+    photo.name = updatePhotoDto.name;
+    return await this.photosRepository.save(photo);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} photo`;
+  async remove(id: string) {
+    const photo = await this.photosRepository.findOne({ id });
+    await fs.unlink(photo.link, (err) => {
+      if (err) {
+        console.error(err);
+        throw err;
+      }
+    })
+    return await this.photosRepository.delete(photo);
   }
 }

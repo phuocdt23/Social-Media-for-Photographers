@@ -1,3 +1,6 @@
+# upload file
+/images
+
 # enviorment variable
 /.env
 # compiled output

@@ -11,7 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
   public async create(createUserDto: CreateUserDto): Promise<IUser> {
     try {
       return await this.userRepository.save(createUserDto);
@@ -66,23 +66,21 @@ export class UsersService {
     newPassword: string,
   ): Promise<any> {
     try {
-      if (oldPassword === newPassword)
-        return {
-          message: 'Your password not changed yet',
-          status: 409,
-        };
-      const user = await this.userRepository.findOne({ email: email });
-      const passwordIsValid = bcrypt.compareSync(oldPassword, user.password);
-      if (!passwordIsValid == true) {
-        return {
-          message: 'Invalid password',
-          status: 403,
-        };
+      if (oldPassword === newPassword){
+        throw new HttpException('Your password not changed yet', HttpStatus.BAD_REQUEST);
       }
+
+      const user = await this.userRepository.findOne({ email });
+      // const passwordIsValid = bcrypt.compareSync(oldPassword, user.password);
+
+      // if (!passwordIsValid == true) {
+      //   throw new HttpException('Invalid Password asdfasdfasd', HttpStatus.BAD_REQUEST);
+      // }
+      
       user.password = bcrypt.hashSync(newPassword, 8);
       return await this.userRepository.save(user);
     } catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+      throw err;
     }
   }
 }

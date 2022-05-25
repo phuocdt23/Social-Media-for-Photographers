@@ -28,7 +28,6 @@ export class UsersController {
 
       return res.status(HttpStatus.OK).json({
         user: user,
-        status: 200,
       });
     } catch (error) {
       throw new UnauthorizedException(error);

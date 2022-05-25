@@ -24,7 +24,7 @@ import path from 'path';
 @ApiBearerAuth()
 @Controller('photos')
 export class PhotosController {
-  constructor(private readonly photosService: PhotosService) {}
+  constructor(private readonly photosService: PhotosService) { }
 
   @Post(':albumId')
   @ApiConsumes('multipart/form-data')
@@ -49,58 +49,47 @@ export class PhotosController {
       fileFilter: imageFileFilter,
     }),
   )
-  async create(
+  public async create(
     @UploadedFile() file: Express.Multer.File,
     @Param('albumId') albumId: string,
     @Req() req,
     @Res() res,
   ) {
-    const data : CreatePhotoDto = {
+    const data: CreatePhotoDto = {
       name: req.body.name,
       link: file.path
     }
     const rs = await this.photosService.create(req.user, albumId, data);
     return res.json(rs);
   }
+
+
+
+  @Get('/:albumId')
+  public async findAllByAlbumId(@Param('albumId') albumId: string, @Res() res) {
+    const rs = await this.photosService.findAllOfAlbum(albumId);
+    return res.json({ rs });
+  }
+  @Get()
+  public async findAll(@Req() req, @Res() res) {
+    const rs = await this.photosService.findAll(req.user);
+    return res.json({ rs });
+  }
+
+  @Get(':id')
+  public async findOne(@Param('id') id: string, @Res() res) {
+    const rs = await this.photosService.findOne(id);
+    return res.json({ rs });
+
+  }
+
+  @Patch(':id')
+  public async update(@Param('id') id: string, @Body() updatePhotoDto: UpdatePhotoDto) {
+    return await this.photosService.update(id, updatePhotoDto);
+  }
+
+  @Delete(':id')
+  public async remove(@Param('id') id: string) {
+    return await this.photosService.remove(id);
+  }
 }
-
-//     const link = path.join('./images', file.filename);
-//     console.log(link);
-//     // const photo = await this.photosService.createPhoto(photodto, link);
-//     res.json({ response });
-//     // res.json({ photo, response });
-//   }
-// }
-//   async create(
-//     @UploadedFile() file,
-//     // @Body() createPhotoDto: CreatePhotoDto,
-//     @Res() res,
-//     @Req() req,
-//   ) {
-//     console.log('-------------------file data----------------------\n', file);
-//     console.log('-------------------user data----------------------\n', req.users);
-//     // console.log('-------------------body data----------------------\n', createPhotoDto);
-//     return res.json({ file });
-//     // return this.photosService.create(createPhotoDto);
-//   }
-
-//   @Get()
-//   findAll() {
-//     return this.photosService.findAll();
-//   }
-
-//   @Get(':id')
-//   findOne(@Param('id') id: string) {
-//     return this.photosService.findOne(+id);
-//   }
-
-//   @Patch(':id')
-//   update(@Param('id') id: string, @Body() updatePhotoDto: UpdatePhotoDto) {
-//     return this.photosService.update(+id, updatePhotoDto);
-//   }
-
-//   @Delete(':id')
-//   remove(@Param('id') id: string) {
-//     return this.photosService.remove(+id);
-//   }
-// }

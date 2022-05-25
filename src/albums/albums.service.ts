@@ -1,17 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { User } from 'src/users/entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '../mailer/mailer.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(Album)
-    private readonly albumsRepository: Repository<Album>, // private readonly usersService: UsersService,
-  ) {}
+    private readonly albumsRepository: Repository<Album>,
+    private readonly mailerService: MailerService,
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
+  ) { }
   public async create(
     createAlbumDto: CreateAlbumDto,
     user: User,
@@ -20,10 +26,12 @@ export class AlbumsService {
       const album = new Album();
       album.name = createAlbumDto.name;
       album.description = createAlbumDto.description;
+      album.ownerId = user.id;
       album.users = [];
       album.users.push(user);
       return await this.albumsRepository.save(album);
     } catch (error) {
+      console.log(error);
       throw new Error();
     }
   }
@@ -44,14 +52,14 @@ export class AlbumsService {
     try {
       return await this.albumsRepository.findOne(id, { relations: ['users'] });
     } catch (error) {
-      throw new Error();
+      throw new Error(error);
     }
   }
   public async findById(id: string): Promise<Album> {
     try {
       return await this.albumsRepository.findOne(id);
     } catch (error) {
-      throw new Error();
+      throw new Error(error);
     }
   }
 
@@ -76,6 +84,70 @@ export class AlbumsService {
       return this.albumsRepository.delete(id);
     } catch (error) {
       throw new Error();
+    }
+  }
+  public async invite(inviteToAlbum) {
+    try {
+      const user = await this.usersService.findByEmail(inviteToAlbum.email);
+      const album = await this.findOne(inviteToAlbum.albumId);
+      if (!user) {
+        return new NotFoundException('User email not found!');
+      }
+      if (!album) {
+        return new NotFoundException('Email does not exist!');
+      }
+      const payload = {
+        email: inviteToAlbum.email,
+        albumId: inviteToAlbum.albumId
+      };
+      const inviteToken = this.jwtService.sign(payload);
+      console.log(inviteToken);
+      const link = `localhost:3000/albums/handle/${inviteToken}`;
+      this.sendMailInvite(inviteToAlbum, link);
+      return;
+    } catch (error) {
+      return new Error(error);
+    }
+  }
+  private sendMailInvite(user, link): void {
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        from: 'from@example.com',
+        subject: 'Invite to Album',
+        text: 'Invite to Album!',
+        template: 'index',
+        context: {
+          title: 'Invite to Album',
+          link,
+          description: `In order to complete registration please click Invite`,
+        },
+      })
+      .then(() => {
+        console.log('Invite User: Send Mail Invite successfully!');
+      })
+      .catch(() => {
+        console.log('Invite User: Send Mail Invite Failed!');
+      });
+  }
+  public async getAllAlbumJoined(user: User): Promise<Album[]>{
+    const album = await this.albumsRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('Album.users', 'User')
+        .where("User.id = :id", { id: user.id })
+        .getMany();
+    return album;
+  }
+  public async handleInvitation(token: string) {
+    try {
+      const { email, albumId } = this.jwtService.verify(token);
+      const user = await this.usersService.findByEmail(email);
+
+      const album = await this.findOne(albumId);
+      album.users.push(user);
+      return await this.albumsRepository.save(album);
+    } catch (error) {
+      throw new Error(error);
     }
   }
 }
