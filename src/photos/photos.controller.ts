@@ -24,7 +24,7 @@ import path from 'path';
 @ApiBearerAuth()
 @Controller('photos')
 export class PhotosController {
-  constructor(private readonly photosService: PhotosService) { }
+  constructor(private readonly photosService: PhotosService) {}
 
   @Post(':albumId')
   @ApiConsumes('multipart/form-data')
@@ -57,13 +57,11 @@ export class PhotosController {
   ) {
     const data: CreatePhotoDto = {
       name: req.body.name,
-      link: file.path
-    }
+      link: file.path,
+    };
     const rs = await this.photosService.create(req.user, albumId, data);
     return res.json(rs);
   }
-
-
 
   @Get('/:albumId')
   public async findAllByAlbumId(@Param('albumId') albumId: string, @Res() res) {
@@ -80,11 +78,13 @@ export class PhotosController {
   public async findOne(@Param('id') id: string, @Res() res) {
     const rs = await this.photosService.findOne(id);
     return res.json({ rs });
-
   }
 
   @Patch(':id')
-  public async update(@Param('id') id: string, @Body() updatePhotoDto: UpdatePhotoDto) {
+  public async update(
+    @Param('id') id: string,
+    @Body() updatePhotoDto: UpdatePhotoDto,
+  ) {
     return await this.photosService.update(id, updatePhotoDto);
   }
 

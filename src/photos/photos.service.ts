@@ -12,7 +12,7 @@ export class PhotosService {
     @InjectRepository(Photo)
     private readonly photosRepository: Repository<Photo>, // private readonly usersService: UsersService,
     private readonly albumsService: AlbumsService, // private readonly usersService: UsersService,
-  ) { }
+  ) {}
   async create(user: User, albumId, data) {
     try {
       const album = await this.albumsService.findById(albumId);
@@ -34,8 +34,8 @@ export class PhotosService {
     try {
       return await this.photosRepository.find({
         select: ['id', 'name', 'link'],
-        where: { user: user }
-      })
+        where: { user: user },
+      });
     } catch (error) {
       throw new Error(error);
     }
@@ -45,8 +45,8 @@ export class PhotosService {
       const album = await this.albumsService.findById(albumId);
       return await this.photosRepository.find({
         select: ['id', 'name', 'link'],
-        where: { album: album }
-      })
+        where: { album: album },
+      });
     } catch (error) {
       throw new Error(error);
     }
@@ -69,7 +69,7 @@ export class PhotosService {
         console.error(err);
         throw err;
       }
-    })
+    });
     return await this.photosRepository.delete(photo);
   }
 }

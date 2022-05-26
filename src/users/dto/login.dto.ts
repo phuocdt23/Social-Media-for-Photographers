@@ -10,7 +10,7 @@ export class LoginDto {
   // @ApiProperty({ example: 'user001' })
   // @IsString()
   // readonly username: string;
-  
+
   @ApiProperty({ example: '123123' })
   @IsNotEmpty()
   @IsString()

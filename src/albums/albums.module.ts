@@ -9,22 +9,23 @@ import { MailerModule } from '../mailer/mailer.module';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Album]),
-  MailerModule,
-  JwtModule.registerAsync({
-    imports: [ConfigModule],
-    useFactory: async (configService: ConfigService) => ({
-      secret: configService.get<string>('SECRET_KEY_CONFIRM_EMAIL'),
-      signOptions: {
-        expiresIn: 3600,
-      },
+  imports: [
+    TypeOrmModule.forFeature([Album]),
+    MailerModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('SECRET_KEY_CONFIRM_EMAIL'),
+        signOptions: {
+          expiresIn: 3600,
+        },
+      }),
+      inject: [ConfigService],
     }),
-    inject: [ConfigService],
-  }),
-  UsersModule
-],
+    UsersModule,
+  ],
   controllers: [AlbumsController],
   providers: [AlbumsService],
   exports: [AlbumsService],
 })
-export class AlbumsModule { }
+export class AlbumsModule {}

@@ -11,5 +11,4 @@ export class InviteToAlbum {
   @IsString()
   @IsNotEmpty()
   readonly albumId: string;
-
 }

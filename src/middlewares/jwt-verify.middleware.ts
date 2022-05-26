@@ -11,16 +11,18 @@ export class JwtVerifyMiddleware implements NestMiddleware {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
-  ) { }
+  ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log('middleware');
       const token = req.headers.authorization.split(' ')[1];
       const payload = await this.jwtService.verify(token);
       const user = await this.userService.findById(payload.id);
       req.user = user;
       next();
     } catch (error) {
+      console.log('error middlewares');
       throw new UnauthorizedException(error);
     }
   }

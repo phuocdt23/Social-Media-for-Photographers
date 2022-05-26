@@ -1,4 +1,11 @@
-import { Injectable, HttpException, HttpStatus, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,7 +27,7 @@ export class UsersService {
     private readonly mailerService: MailerService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
   public async create(createUserDto: CreateUserDto) {
     try {
       return await this.userRepository.save(createUserDto);
@@ -71,18 +78,27 @@ export class UsersService {
   }
   public async updatePassword(
     updatePasswordDto: UpdatePasswordDto,
-    user: User
+    user: User,
   ): Promise<User> {
     try {
       // const user = await this.userRepository.findOne({ user.email });
-      const passwordIsValid = bcrypt.compareSync(updatePasswordDto.currentPassword, user.password);
+      const passwordIsValid = bcrypt.compareSync(
+        updatePasswordDto.currentPassword,
+        user.password,
+      );
 
       if (!passwordIsValid == true) {
-        throw new HttpException('Invalid Current Password', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Invalid Current Password',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       if (updatePasswordDto.currentPassword === updatePasswordDto.newPassword) {
-        throw new HttpException('Your new pasword cannot be same as your old password!', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Your new pasword cannot be same as your old password!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       user.password = bcrypt.hashSync(updatePasswordDto.newPassword, 8);
@@ -92,28 +108,25 @@ export class UsersService {
     }
   }
   // for register account
-  public async register(
-    createUserDto: CreateUserDto,
-  ) {
+  public async register(createUserDto: CreateUserDto) {
     try {
-      const userByEmail = await this.findByEmail(
-        createUserDto.email,
-      );
-      const userByUsername = await this.findByUsername(
-        createUserDto.username,
-      );
+      const userByEmail = await this.findByEmail(createUserDto.email);
+      const userByUsername = await this.findByUsername(createUserDto.username);
 
-      if (userByEmail) { throw new ConflictException('This email already existed!'); }
-      if (userByUsername) { throw new ConflictException('This username already existed!'); };
+      if (userByEmail) {
+        throw new ConflictException('This email already existed!');
+      }
+      if (userByUsername) {
+        throw new ConflictException('This username already existed!');
+      }
 
       createUserDto.password = bcrypt.hashSync(createUserDto.password, 8);
       const payload = {
-        email: createUserDto.email
+        email: createUserDto.email,
       };
-      const confirmToken = this.jwtService.sign(
-        payload
-        , { secret: this.configService.get<string>('SECRET_KEY_CONFIRM_EMAIL') }
-      );
+      const confirmToken = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('SECRET_KEY_CONFIRM_EMAIL'),
+      });
       console.log(confirmToken);
       const link = `localhost:3000/users/register/${confirmToken}`;
       this.sendMailConfirm(createUserDto, link);
@@ -131,7 +144,8 @@ export class UsersService {
 
       if (!user.isConfirmed) {
         throw new UnauthorizedException(
-          'Your account is not confirmed yet, please check your mail');
+          'Your account is not confirmed yet, please check your mail',
+        );
       }
 
       const passwordIsValid = bcrypt.compareSync(
@@ -158,13 +172,10 @@ export class UsersService {
     } catch (error) {
       throw error;
     }
-
   }
 
   //for forgot password route
-  public async forgotPassword(
-    forgotPasswordDto: ForgotPasswordDto,
-  ) {
+  public async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     try {
       const user = await this.userRepository.findOne({
         email: forgotPasswordDto.email,
@@ -202,9 +213,6 @@ export class UsersService {
       });
   }
 
-
-
-
   //Need to rewrite
   private sendMailConfirm(user, link): void {
     this.mailerService
@@ -230,10 +238,9 @@ export class UsersService {
   }
   public async confirmEmailRegistration(token: string): Promise<User> {
     try {
-      const { email } = this.jwtService.verify(
-        token,
-        { secret: this.configService.get<string>('SECRET_KEY_CONFIRM_EMAIL') }
-      );
+      const { email } = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('SECRET_KEY_CONFIRM_EMAIL'),
+      });
       const user = await this.findByEmail(email);
       user.isConfirmed = true;
       return await this.userRepository.save(user);
@@ -241,5 +248,4 @@ export class UsersService {
       throw new UnauthorizedException(error);
     }
   }
-
 }

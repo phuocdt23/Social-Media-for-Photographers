@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -17,7 +22,7 @@ export class AlbumsService {
     private readonly mailerService: MailerService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
   public async create(
     createAlbumDto: CreateAlbumDto,
     user: User,
@@ -31,8 +36,7 @@ export class AlbumsService {
       album.users.push(user);
       return await this.albumsRepository.save(album);
     } catch (error) {
-      console.log(error);
-      throw new Error();
+      throw error;
     }
   }
 
@@ -44,7 +48,7 @@ export class AlbumsService {
       });
       return albums;
     } catch (error) {
-      throw new Error();
+      throw error;
     }
   }
 
@@ -52,14 +56,14 @@ export class AlbumsService {
     try {
       return await this.albumsRepository.findOne(id, { relations: ['users'] });
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
   public async findById(id: string): Promise<Album> {
     try {
       return await this.albumsRepository.findOne(id);
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
@@ -73,17 +77,21 @@ export class AlbumsService {
       album.description = updateAlbumDto.description;
       return await this.albumsRepository.save(album);
     } catch (error) {
-      throw new Error();
+      throw error;
     }
   }
 
-  public async remove(id: string) {
+  public async remove(id: string, user: User) {
     try {
-      // unchecked owner yet!
-      console.log(await this.albumsRepository.delete(id));
-      return this.albumsRepository.delete(id);
+      const album = await this.findOne(id);
+      if (album.ownerId !== user.id) {
+        throw new UnauthorizedException('You are not owner of this album!');
+      }
+      const rs = await this.albumsRepository.delete(id);
+      // need to delete all photo in this album!
+      return rs;
     } catch (error) {
-      throw new Error();
+      throw error;
     }
   }
   public async invite(inviteToAlbum) {
@@ -98,7 +106,7 @@ export class AlbumsService {
       }
       const payload = {
         email: inviteToAlbum.email,
-        albumId: inviteToAlbum.albumId
+        albumId: inviteToAlbum.albumId,
       };
       const inviteToken = this.jwtService.sign(payload);
       console.log(inviteToken);
@@ -106,7 +114,7 @@ export class AlbumsService {
       this.sendMailInvite(inviteToAlbum, link);
       return;
     } catch (error) {
-      return new Error(error);
+      throw error;
     }
   }
   private sendMailInvite(user, link): void {
@@ -130,13 +138,17 @@ export class AlbumsService {
         console.log('Invite User: Send Mail Invite Failed!');
       });
   }
-  public async getAllAlbumJoined(user: User): Promise<Album[]>{
-    const album = await this.albumsRepository
+  public async getAllAlbumJoined(user: User): Promise<Album[]> {
+    try {
+      const album = await this.albumsRepository
         .createQueryBuilder()
         .leftJoinAndSelect('Album.users', 'User')
-        .where("User.id = :id", { id: user.id })
+        .where('User.id = :id', { id: user.id })
         .getMany();
-    return album;
+      return album;
+    } catch (error) {
+      throw error;
+    }
   }
   public async handleInvitation(token: string) {
     try {
@@ -147,7 +159,7 @@ export class AlbumsService {
       album.users.push(user);
       return await this.albumsRepository.save(album);
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 }

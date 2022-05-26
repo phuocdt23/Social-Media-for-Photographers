@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -23,25 +28,31 @@ import { JwtModule } from '@nestjs/jwt';
     PhotosModule,
     PostsModule,
     MailerModule,
-      JwtModule.registerAsync({
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-          secret: configService.get<string>('SECRET_KEY_JWT'),
-          signOptions: {
-            expiresIn: 3600,
-          },
-        }),
-        inject: [ConfigService],
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('SECRET_KEY_JWT'),
+        signOptions: {
+          expiresIn: 3600,
+        },
       }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtVerifyMiddleware).forRoutes('albums', 'photos');
     consumer
-    .apply(JwtVerifyMiddleware)
-    .forRoutes({ path: 'users/change-password', method: RequestMethod.POST });
+      .apply(JwtVerifyMiddleware)
+      .exclude({ path: 'albums/handle/:token', method: RequestMethod.GET })
+      .forRoutes(
+        'albums',
+        'photos',
+        { path: 'users/change-password', method: RequestMethod.POST },
+        { path: 'users', method: RequestMethod.PUT },
+        { path: 'users', method: RequestMethod.GET },
+      );
   }
 }

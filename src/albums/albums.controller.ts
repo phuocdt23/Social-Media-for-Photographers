@@ -18,22 +18,20 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 @ApiTags('albums')
 @ApiBearerAuth()
 export class AlbumsController {
-  constructor(private readonly albumsService: AlbumsService) { }
+  constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
   create(@Body() createAlbumDto: CreateAlbumDto, @Req() req) {
     return this.albumsService.create(createAlbumDto, req.user);
   }
-  @Post('invite_to_album')
+  @Post('invite-to-album')
   async inviteToAlbum(@Body() inviteToAlbum: InviteToAlbum, @Req() req) {
     const rs = await this.albumsService.invite(inviteToAlbum);
-    console.log(rs);
     return rs;
   }
   @Get('handle/:token')
   async handleInvite(@Param('token') token: string) {
     const rs = await this.albumsService.handleInvitation(token);
-    console.log(rs);
     return rs;
   }
 
@@ -57,7 +55,7 @@ export class AlbumsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.albumsService.remove(id);
+  remove(@Req() req, @Param('id') id: string) {
+    return this.albumsService.remove(id, req.user);
   }
 }
