@@ -6,6 +6,11 @@ export class LoginDto {
   @IsEmail()
   readonly email: string;
 
+  // register with gmail either username
+  // @ApiProperty({ example: 'user001' })
+  // @IsString()
+  // readonly username: string;
+  
   @ApiProperty({ example: '123123' })
   @IsNotEmpty()
   @IsString()
