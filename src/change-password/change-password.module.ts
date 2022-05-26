@@ -11,18 +11,18 @@ import { ChangePasswordService } from './change-password.service';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('SECRET_KEY_JWT'),
-        signOptions: {
-          expiresIn: 3600,
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get<string>('SECRET_KEY_JWT'),
+    //     signOptions: {
+    //       expiresIn: 3600,
+    //     },
+    //   }),
+    //   inject: [ConfigService],
+    // }),
   ],
   controllers: [ChangePasswordController],
-  providers: [ChangePasswordService, UsersService],
+  providers: [ChangePasswordService, ],//UsersService
 })
 export class ChangePasswordModule {}

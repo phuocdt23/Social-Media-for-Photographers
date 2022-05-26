@@ -8,7 +8,6 @@ import { CommentsModule } from './comments/comments.module';
 import { FollowersModule } from './followers/followers.module';
 import { PhotosModule } from './photos/photos.module';
 import { PostsModule } from './posts/posts.module';
-import { RegisterModule } from './register/register.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoginModule } from './login/login.module';
@@ -26,7 +25,6 @@ import { JwtModule } from '@nestjs/jwt';
     FollowersModule,
     PhotosModule,
     PostsModule,
-    RegisterModule,
     MailerModule,
     LoginModule,
     ChangePasswordModule,
@@ -47,6 +45,6 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtVerifyMiddleware).forRoutes('users', 'albums', 'photos');
+    consumer.apply(JwtVerifyMiddleware).forRoutes('albums', 'photos');
   }
 }

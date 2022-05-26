@@ -21,7 +21,6 @@ export class JwtVerifyMiddleware implements NestMiddleware {
       req.user = user;
       next();
     } catch (error) {
-      // console.log(error);
       throw new UnauthorizedException(error);
     }
   }

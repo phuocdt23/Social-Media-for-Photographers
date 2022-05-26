@@ -11,18 +11,18 @@ import { LoginService } from './login.service';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('SECRET_KEY_JWT'),
-        signOptions: {
-          expiresIn: 3600,
-        },
-      }),
-      inject: [ConfigService],
-    }),
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get<string>('SECRET_KEY_JWT'),
+    //     signOptions: {
+    //       expiresIn: 3600,
+    //     },
+    //   }),
+    //   inject: [ConfigService],
+    // }),
   ],
   controllers: [LoginController],
-  providers: [LoginService, UsersService],
+  providers: [LoginService, ],//UsersService
 })
 export class LoginModule {}
