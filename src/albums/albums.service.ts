@@ -110,9 +110,9 @@ export class AlbumsService {
       };
       const inviteToken = this.jwtService.sign(payload);
       console.log(inviteToken);
-      const link = `localhost:3000/albums/handle/${inviteToken}`;
-      this.sendMailInvite(inviteToAlbum, link);
-      return;
+      const link = `localhost:3000/albums/handleInviation/${inviteToken}`;
+      const rs = this.sendMailInvite(inviteToAlbum, link);
+      return rs;
     } catch (error) {
       throw error;
     }
@@ -131,8 +131,9 @@ export class AlbumsService {
           description: `In order to complete registration please click Invite`,
         },
       })
-      .then(() => {
-        console.log('Invite User: Send Mail Invite successfully!');
+      .then((rs) => {
+        console.log('Invite User: Send Mail Invite successfully!', rs);
+        return rs;
       })
       .catch(() => {
         console.log('Invite User: Send Mail Invite Failed!');

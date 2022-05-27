@@ -1,26 +1,31 @@
 /* eslint-disable prettier/prettier */
 import {
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    ManyToOne,
-  } from 'typeorm';
-  import { ApiProperty } from '@nestjs/swagger';
-  // import { Comment } from '../comment/comment.entity';
-  import { User } from '../../users/entities/user.entity';
-  import { Post } from '../../posts/entities/post.entity';
-  @Entity({ name: 'Comment' })
-  export class Comment {
-    @PrimaryGeneratedColumn('uuid')
-    id: number;
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { Photo } from 'src/photos/entities/photo.entity';
+@Entity({ name: 'Comment' })
+export class Comment {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ nullable: false })
+  content: string;
   
-    @Column({ nullable: false })
-    content: string;
+  @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
+  updatedAt: Date;
   
-    @ManyToOne(() => Post, (post) => post.comments)
-    post: Post;
-  
-    @ManyToOne(() => User, (user) => user.posts)
-    user: User;
-  }
-  
+  @ManyToOne(() => Photo, photo => photo.comments)
+  photo: Photo;
+
+  @ManyToOne(() => User, user => user.photos)
+  user: User;
+}

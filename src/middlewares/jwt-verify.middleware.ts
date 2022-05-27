@@ -1,4 +1,5 @@
 import {
+  HttpStatus,
   Injectable,
   NestMiddleware,
   UnauthorizedException,
@@ -16,6 +17,13 @@ export class JwtVerifyMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       console.log('middleware');
+      if (!req.headers.authorization) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'Please Login To Access Resource!(do not have token!)',
+          status: 401,
+          data: {},
+        });
+      }
       const token = req.headers.authorization.split(' ')[1];
       const payload = await this.jwtService.verify(token);
       const user = await this.userService.findById(payload.id);

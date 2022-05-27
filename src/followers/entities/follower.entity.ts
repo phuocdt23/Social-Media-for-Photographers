@@ -7,11 +7,9 @@ import { User } from '../../users/entities/user.entity';
 export class Follower {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column({ name: 'followerId' })
-  followerId!: number;
 
   @ManyToMany(() => User)
   @JoinTable({ name: 'User_Follower' })
-  user: User;
+  users: User[];
 }
 

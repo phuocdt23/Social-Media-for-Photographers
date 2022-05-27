@@ -1,37 +1,39 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Photo } from '../../photos/entities/photo.entity';
-import { Post } from '../../posts/entities/post.entity';
 import { Comment } from '../../comments/entities/comment.entity';
+import { Like } from 'src/likes/entities/like.entity';
 // import { Follower } from '../../followers/entities/follower.entity';
 @Entity({ name: 'User' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ example: 'user001' })
   @Column({
     unique: true,
     nullable: false,
   })
   username: string;
 
-  @ApiProperty({ example: 'user1' })
   @Column({ nullable: false })
   name: string;
 
-  @ApiProperty({ example: 'user001@gmail.com' })
   @Column({
     unique: true,
     nullable: false,
   })
   email: string;
 
-  @ApiProperty({ example: '123123' })
   @Column({ nullable: false })
   password: string;
 
-  @ApiProperty()
   @Column({
     nullable: false,
     default: false,
@@ -41,9 +43,14 @@ export class User {
   @OneToMany(() => Photo, (photo) => photo.user)
   photos: Photo[];
 
-  @OneToMany(() => Post, (post) => post.user)
-  posts: Post[];
-
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
+
+  @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
+  updatedAt: Date;
 }

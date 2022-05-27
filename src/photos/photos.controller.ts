@@ -19,8 +19,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { editFileName, imageFileFilter } from 'src/configs/uploadFile';
 import { diskStorage } from 'multer';
-import path from 'path';
-@ApiTags('Photos')
+@ApiTags('Photo')
 @ApiBearerAuth()
 @Controller('photos')
 export class PhotosController {

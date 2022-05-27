@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Req,
+  HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AlbumsService } from './albums.service';
@@ -14,48 +16,99 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { InviteToAlbum } from './dto/invite-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 
-@Controller('albums')
-@ApiTags('albums')
+@ApiTags('Album')
 @ApiBearerAuth()
+@Controller('albums')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto, @Req() req) {
-    return this.albumsService.create(createAlbumDto, req.user);
+  public async create(
+    @Body() createAlbumDto: CreateAlbumDto,
+    @Req() req,
+    @Res() res,
+  ) {
+    const rs = await this.albumsService.create(createAlbumDto, req.user);
+    return res.status(HttpStatus.OK).json({
+      message: 'Create Album Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
-  @Post('invite-to-album')
-  async inviteToAlbum(@Body() inviteToAlbum: InviteToAlbum, @Req() req) {
-    const rs = await this.albumsService.invite(inviteToAlbum);
-    return rs;
+  @Post('inviteToAlbum')
+  public async inviteToAlbum(
+    @Body() inviteToAlbum: InviteToAlbum,
+    @Req() req,
+    @Res() res,
+  ) {
+    const rs = this.albumsService.invite(inviteToAlbum);
+    return res.status(HttpStatus.OK).json({
+      message:
+        'Invite To Album Successfully! (Sending mail to user successfully)',
+      status: 200,
+      data: rs,
+    });
   }
-  @Get('handle/:token')
-  async handleInvite(@Param('token') token: string) {
+  @Get('handleInviation/:token')
+  public async handleInvite(@Param('token') token: string, @Res() res) {
     const rs = await this.albumsService.handleInvitation(token);
-    return rs;
+    return res.status(HttpStatus.OK).json({
+      message: 'Handle Invite Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
 
   @Get()
-  findAll(@Req() req) {
-    return this.albumsService.findAll(req.user);
+  public async findAll(@Req() req, @Res() res) {
+    const rs = await this.albumsService.findAll(req.user);
+    return res.status(HttpStatus.OK).json({
+      message: 'Get All Your Album Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
-  @Get('/all')
-  findAllJoinedAlbum(@Req() req) {
-    return this.albumsService.getAllAlbumJoined(req.user);
+  @Get('/allAlbumJoined')
+  public async findAllJoinedAlbum(@Req() req, @Res() res) {
+    const rs = await this.albumsService.getAllAlbumJoined(req.user);
+    return res.status(HttpStatus.OK).json({
+      message: 'Get All Album You Joined!',
+      status: 200,
+      data: rs,
+    });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.albumsService.findOne(id);
+  public async findOne(@Param('id') id: string, @Res() res) {
+    const rs = await this.albumsService.findOne(id);
+    return res.status(HttpStatus.OK).json({
+      message: 'Get One Album Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
-    return this.albumsService.update(id, updateAlbumDto);
+  public async update(
+    @Param('id') id: string,
+    @Body() updateAlbumDto: UpdateAlbumDto,
+    @Res() res,
+  ) {
+    const rs = await this.albumsService.update(id, updateAlbumDto);
+    return res.status(HttpStatus.OK).json({
+      message: 'Update Album Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
 
   @Delete(':id')
-  remove(@Req() req, @Param('id') id: string) {
-    return this.albumsService.remove(id, req.user);
+  public async remove(@Req() req, @Res() res, @Param('id') id: string) {
+    const rs = await this.albumsService.remove(id, req.user);
+    return res.status(HttpStatus.OK).json({
+      message: 'Delete Album Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
 }

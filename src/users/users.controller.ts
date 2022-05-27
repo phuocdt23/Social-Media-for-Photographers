@@ -18,8 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-@ApiTags('users')
-@ApiBearerAuth()
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

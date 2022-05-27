@@ -12,11 +12,11 @@ import { AlbumsModule } from './albums/albums.module';
 import { CommentsModule } from './comments/comments.module';
 import { FollowersModule } from './followers/followers.module';
 import { PhotosModule } from './photos/photos.module';
-import { PostsModule } from './posts/posts.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtVerifyMiddleware } from './middlewares/jwt-verify.middleware';
 import { JwtModule } from '@nestjs/jwt';
+import { LikesModule } from './likes/likes.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
@@ -26,7 +26,6 @@ import { JwtModule } from '@nestjs/jwt';
     CommentsModule,
     FollowersModule,
     PhotosModule,
-    PostsModule,
     MailerModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -38,6 +37,7 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       inject: [ConfigService],
     }),
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -46,10 +46,15 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(JwtVerifyMiddleware)
-      .exclude({ path: 'albums/handle/:token', method: RequestMethod.GET })
+      .exclude({
+        path: 'albums/handleInviation/:token',
+        method: RequestMethod.GET,
+      })
       .forRoutes(
         'albums',
         'photos',
+        'comments',
+
         { path: 'users/change-password', method: RequestMethod.POST },
         { path: 'users', method: RequestMethod.PUT },
         { path: 'users', method: RequestMethod.GET },
