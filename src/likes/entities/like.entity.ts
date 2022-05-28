@@ -13,10 +13,13 @@ export class Like {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.likes)
+  @ManyToOne(() => User, (user) => user.likes, { eager: true })
   user: User;
 
-  @ManyToOne(() => Photo, (photo) => photo.likes)
+  @ManyToOne(() => Photo, (photo) => photo.likes, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   photo: Photo;
 
   @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })

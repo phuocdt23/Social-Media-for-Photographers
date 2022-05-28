@@ -70,6 +70,6 @@ export class PhotosService {
         throw err;
       }
     });
-    return await this.photosRepository.delete(photo);
+    return await this.photosRepository.delete(photo.id);
   }
 }
