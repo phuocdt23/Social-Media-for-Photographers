@@ -8,7 +8,7 @@ export class Follower {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, user => user.followers)
   @JoinTable({ name: 'User_Follower' })
   users: User[];
 }

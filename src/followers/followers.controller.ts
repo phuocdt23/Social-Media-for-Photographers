@@ -12,7 +12,7 @@ import { FollowersService } from './followers.service';
 
 @ApiTags('Follow')
 @ApiBearerAuth()
-@Controller('followers')
+@Controller('follows')
 export class FollowersController {
   constructor(private readonly followersService: FollowersService) {}
 
@@ -38,9 +38,4 @@ export class FollowersController {
       data: rs,
     });
   }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   // return this.followersService.findOne(+id);
-  // }
 }

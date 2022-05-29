@@ -14,12 +14,11 @@ export class FollowersService {
   ) {}
   public async followAndUnFollow(username: string, user: User) {
     try {
-      console.log('-----------------------------------------\n');
-
       // logined user ==> followerId, user find by username ==> userId
       const follower = await this.followerRepository.findOne(user.id, {
         relations: ['users'],
       });
+
       const idol = await this.userRepository.findOne({
         where: {
           username: username,
@@ -33,31 +32,37 @@ export class FollowersService {
       if (!follower.users.length) {
         follower.users = [];
         follower.users.push(idol);
+
         const rs = await this.followerRepository.save(follower);
-        console.log(rs);
+
+        return {
+          message: `Follow User #${username} Successfully!`,
+          data: rs,
+        };
       } else {
-        console.log(2);
         //check idol in users[]
-        //true <=>have followed
+
         let flag = false;
         for (const idolInArray of follower.users) {
           console.log(idolInArray);
+
           if (idolInArray.id === idol.id) {
-            console.log('found---------------------');
-            //  unfollow
+            //  unfollow and switch flag
             //delete an element in following user(idol)
-            console.log('do unfollow');
             follower.users.splice(follower.users.indexOf(idolInArray), 1);
             await this.followerRepository.save(follower);
             flag = true;
             break;
           }
         }
+
         console.log(flag);
+
         if (!flag) {
           console.log('do follow');
           follower.users.push(idol);
           const rs = await this.followerRepository.save(follower);
+
           return {
             message: `Follow User #${username} Successfully!`,
             data: rs,
@@ -75,17 +80,15 @@ export class FollowersService {
   }
   public async getAllFollowers(user: User) {
     try {
-      // const album = await this.albumsRepository
-      //   .createQueryBuilder()
-      //   .leftJoinAndSelect('Album.users', 'User')
-      //   .where('User.id = :id', { id: user.id })
-      //   .getMany();
-      const rs = await this.followerRepository
+      const rs = await this.userRepository
         .createQueryBuilder()
-        .leftJoinAndSelect('Follower.users', 'User')
+        .leftJoinAndSelect('User.followers', 'Follow')
         .where('User.id = :id', { id: user.id })
-        .getMany();
-      return rs;
+        .getOne();
+      return {
+        followers: rs.followers,
+        numberOfYourFollower: rs.followers.length,
+      };
     } catch (error) {
       throw error;
     }

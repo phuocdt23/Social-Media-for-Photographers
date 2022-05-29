@@ -5,11 +5,13 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Photo } from '../../photos/entities/photo.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from 'src/likes/entities/like.entity';
+import { Follower } from 'src/followers/entities/follower.entity';
 // import { Follower } from '../../followers/entities/follower.entity';
 @Entity({ name: 'User' })
 export class User {
@@ -45,8 +47,12 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
+
+  @ManyToMany(() => Follower, (follower) => follower.users)
+  followers: Follower[];
 
   @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
   createdAt: Date;
