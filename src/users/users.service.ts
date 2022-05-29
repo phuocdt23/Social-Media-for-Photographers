@@ -18,10 +18,13 @@ import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { Follower } from 'src/followers/entities/follower.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectRepository(Follower)
+    private readonly followerRepository: Repository<Follower>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly mailerService: MailerService,
@@ -81,7 +84,6 @@ export class UsersService {
     user: User,
   ): Promise<User> {
     try {
-      // const user = await this.userRepository.findOne({ user.email });
       const passwordIsValid = bcrypt.compareSync(
         updatePasswordDto.currentPassword,
         user.password,
@@ -148,14 +150,14 @@ export class UsersService {
         );
       }
 
-      const passwordIsValid = bcrypt.compareSync(
-        loginDto.password,
-        user.password,
-      );
+      // const passwordIsValid = bcrypt.compareSync(
+      //   loginDto.password,
+      //   user.password,
+      // );
 
-      if (!passwordIsValid == true) {
-        throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
-      }
+      // if (!passwordIsValid == true) {
+      //   throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
+      // }
 
       const payload = {
         name: user.name,
@@ -243,6 +245,11 @@ export class UsersService {
       });
       const user = await this.findByEmail(email);
       user.isConfirmed = true;
+      // create follower with the same id with registered user
+      const follower = new Follower();
+      follower.id = user.id;
+      this.followerRepository.save(follower);
+
       return await this.userRepository.save(user);
     } catch (error) {
       throw new UnauthorizedException(error);

@@ -55,6 +55,7 @@ export class AppModule implements NestModule {
         'photos',
         'comments',
         'likes',
+        'followers',
 
         { path: 'users/change-password', method: RequestMethod.POST },
         { path: 'users', method: RequestMethod.PUT },

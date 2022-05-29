@@ -1,45 +1,46 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
+  HttpCode,
+  HttpStatus,
   Param,
-  Delete,
+  Req,
+  Res,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FollowersService } from './followers.service';
-import { CreateFollowerDto } from './dto/create-follower.dto';
-import { UpdateFollowerDto } from './dto/update-follower.dto';
 
+@ApiTags('Follow')
+@ApiBearerAuth()
 @Controller('followers')
 export class FollowersController {
   constructor(private readonly followersService: FollowersService) {}
 
-  @Post()
-  create(@Body() createFollowerDto: CreateFollowerDto) {
-    return this.followersService.create(createFollowerDto);
+  @Get(':username')
+  async create(@Param('username') username: string, @Req() req, @Res() res) {
+    const rs = await this.followersService.followAndUnFollow(
+      username,
+      req.user,
+    );
+    return res.status(HttpStatus.OK).json({
+      message: rs.message,
+      status: 200,
+      data: rs.data,
+    });
   }
 
   @Get()
-  findAll() {
-    return this.followersService.findAll();
+  async findAll(@Req() req, @Res() res) {
+    const rs = await this.followersService.getAllFollowers(req.user);
+    return res.status(HttpStatus.OK).json({
+      message: 'All the Follower Of Yours!',
+      status: 200,
+      data: rs,
+    });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.followersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFollowerDto: UpdateFollowerDto,
-  ) {
-    return this.followersService.update(+id, updateFollowerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.followersService.remove(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   // return this.followersService.findOne(+id);
+  // }
 }
