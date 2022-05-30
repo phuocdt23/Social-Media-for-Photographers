@@ -12,13 +12,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { MailerService } from 'src/mailer/mailer.service';
+import { MailerService } from '../mailer/mailer.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { Follower } from 'src/followers/entities/follower.entity';
+import { Follower } from '../followers/entities/follower.entity';
 
 @Injectable()
 export class UsersService {
@@ -150,14 +150,14 @@ export class UsersService {
         );
       }
 
-      // const passwordIsValid = bcrypt.compareSync(
-      //   loginDto.password,
-      //   user.password,
-      // );
+      const passwordIsValid = bcrypt.compareSync(
+        loginDto.password,
+        user.password,
+      );
 
-      // if (!passwordIsValid == true) {
-      //   throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
-      // }
+      if (passwordIsValid == false) {
+        throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
+      }
 
       const payload = {
         name: user.name,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AlbumsService } from 'src/albums/albums.service';
-import { User } from 'src/users/entities/user.entity';
+import { AlbumsService } from '../albums/albums.service';
+import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { Photo } from './entities/photo.entity';

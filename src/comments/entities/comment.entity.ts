@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Photo } from 'src/photos/entities/photo.entity';
+import { Photo } from '../../photos/entities/photo.entity';
 @Entity({ name: 'Comment' })
 export class Comment {
   @PrimaryGeneratedColumn('uuid')

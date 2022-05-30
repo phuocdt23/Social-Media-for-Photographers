@@ -9,7 +9,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Photo } from '../../photos/entities/photo.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 enum Status {
   Public = 'Public',
   Private = 'Private',

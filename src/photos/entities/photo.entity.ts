@@ -11,7 +11,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../users/entities/user.entity';
 import { Album } from '../../albums/entities/album.entity';
 import { Comment } from '../../comments/entities/comment.entity';
-import { Like } from 'src/likes/entities/like.entity';
+import { Like } from '../../likes/entities/like.entity';
 @Entity({ name: 'Photo' })
 export class Photo {
   @PrimaryGeneratedColumn('uuid')

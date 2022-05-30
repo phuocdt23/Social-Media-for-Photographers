@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailerModule } from 'src/mailer/mailer.module';
+import { MailerModule } from '../mailer/mailer.module';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Follower } from 'src/followers/entities/follower.entity';
+import { Follower } from '../followers/entities/follower.entity';
 
 @Module({
   imports: [

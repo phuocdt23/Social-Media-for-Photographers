@@ -10,9 +10,8 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Photo } from '../../photos/entities/photo.entity';
 import { Comment } from '../../comments/entities/comment.entity';
-import { Like } from 'src/likes/entities/like.entity';
-import { Follower } from 'src/followers/entities/follower.entity';
-// import { Follower } from '../../followers/entities/follower.entity';
+import { Like } from '../../likes/entities/like.entity';
+import { Follower } from '../../followers/entities/follower.entity';
 @Entity({ name: 'User' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -33,7 +32,7 @@ export class User {
   })
   email: string;
 
-  @Column({ nullable: false, select: false })
+  @Column({ nullable: false })
   password: string;
 
   @Column({

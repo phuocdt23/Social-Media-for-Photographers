@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Photo } from 'src/photos/entities/photo.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Photo } from '../photos/entities/photo.entity';
+import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';

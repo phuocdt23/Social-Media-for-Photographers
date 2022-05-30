@@ -63,9 +63,9 @@ export class UsersController {
   @Post('register')
   public async register(@Res() res, @Body() createUserDto: CreateUserDto) {
     const rs = await this.usersService.register(createUserDto);
-    return res.status(HttpStatus.OK).json({
+    return res.status(HttpStatus.CREATED).json({
       message: 'You need to check your mail to confirm registration!',
-      status: 200,
+      status: 201,
       data: rs,
     });
   }

@@ -1,5 +1,5 @@
-import { Photo } from 'src/photos/entities/photo.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Photo } from '../../photos/entities/photo.entity';
+import { User } from '../../users/entities/user.entity';
 import {
   CreateDateColumn,
   Entity,

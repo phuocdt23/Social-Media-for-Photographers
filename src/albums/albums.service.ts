@@ -9,10 +9,10 @@ import { Repository } from 'typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '../mailer/mailer.service';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AlbumsService {

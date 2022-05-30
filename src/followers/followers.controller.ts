@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FollowersService } from './followers.service';
 

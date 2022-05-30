@@ -17,7 +17,7 @@ import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { editFileName, imageFileFilter } from 'src/configs/uploadFile';
+import { editFileName, imageFileFilter } from '../configs/uploadFile';
 import { diskStorage } from 'multer';
 @ApiTags('Photo')
 @ApiBearerAuth()

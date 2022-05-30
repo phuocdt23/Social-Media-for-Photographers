@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 // import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../users/entities/user.entity';
 
