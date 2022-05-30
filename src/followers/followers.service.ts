@@ -3,15 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Follower } from './entities/follower.entity';
+import { UsersService } from 'src/users/users.service';
+import { Inject } from '@nestjs/common';
+import { forwardRef } from '@nestjs/common';
 
 @Injectable()
 export class FollowersService {
   constructor(
     @InjectRepository(Follower)
     private readonly followerRepository: Repository<Follower>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
   ) {}
+  public async createById(id: string) {
+    const follower = new Follower();
+    follower.id = id;
+    return this.followerRepository.save(follower);
+  }
   public async followAndUnFollow(username: string, user: User) {
     try {
       // logined user ==> followerId, user find by username ==> userId
@@ -19,10 +27,8 @@ export class FollowersService {
         relations: ['users'],
       });
 
-      const idol = await this.userRepository.findOne({
-        where: {
-          username: username,
-        },
+      const idol = await this.usersService.findOneUser({
+        username: username,
       });
 
       if (!idol) {
@@ -30,6 +36,8 @@ export class FollowersService {
       }
 
       if (!follower.users.length) {
+        console.log(`do follow`);
+
         follower.users = [];
         follower.users.push(idol);
 
@@ -61,16 +69,14 @@ export class FollowersService {
         if (!flag) {
           console.log('do follow');
           follower.users.push(idol);
-          const rs = await this.followerRepository.save(follower);
+          await this.followerRepository.save(follower);
 
           return {
             message: `Follow User #${username} Successfully!`,
-            data: rs,
           };
         } else {
           return {
             message: `Unfollow user #${username} Successfully!`,
-            data: follower.users,
           };
         }
       }
@@ -80,11 +86,7 @@ export class FollowersService {
   }
   public async getAllFollowers(user: User) {
     try {
-      const rs = await this.userRepository
-        .createQueryBuilder()
-        .leftJoinAndSelect('User.followers', 'Follow')
-        .where('User.id = :id', { id: user.id })
-        .getOne();
+      const rs = await this.usersService.getAllFollowers(user);
       return {
         followers: rs.followers,
         numberOfYourFollower: rs.followers.length,

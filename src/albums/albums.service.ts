@@ -96,7 +96,9 @@ export class AlbumsService {
   }
   public async invite(inviteToAlbum) {
     try {
-      const user = await this.usersService.findByEmail(inviteToAlbum.email);
+      const user = await this.usersService.findOneUser({
+        email: inviteToAlbum.email,
+      });
       const album = await this.findOne(inviteToAlbum.albumId);
       if (!user) {
         return new NotFoundException('User email not found!');
@@ -154,7 +156,7 @@ export class AlbumsService {
   public async handleInvitation(token: string) {
     try {
       const { email, albumId } = this.jwtService.verify(token);
-      const user = await this.usersService.findByEmail(email);
+      const user = await this.usersService.findOneUser({ email: email });
 
       const album = await this.findOne(albumId);
       album.users.push(user);

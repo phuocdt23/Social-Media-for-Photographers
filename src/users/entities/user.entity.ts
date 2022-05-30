@@ -19,7 +19,6 @@ export class User {
 
   @Column({
     unique: true,
-    nullable: false,
   })
   username: string;
 
@@ -28,7 +27,6 @@ export class User {
 
   @Column({
     unique: true,
-    nullable: false,
   })
   email: string;
 
@@ -36,7 +34,6 @@ export class User {
   password: string;
 
   @Column({
-    nullable: false,
     default: false,
   })
   isConfirmed: boolean;

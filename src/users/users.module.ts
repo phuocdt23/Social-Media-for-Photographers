@@ -6,11 +6,12 @@ import { MailerModule } from '../mailer/mailer.module';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Follower } from '../followers/entities/follower.entity';
+import { FollowersModule } from '../followers/followers.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Follower]),
+    TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -21,6 +22,7 @@ import { Follower } from '../followers/entities/follower.entity';
       }),
       inject: [ConfigService],
     }),
+    FollowersModule,
     MailerModule,
     ConfigModule,
   ],

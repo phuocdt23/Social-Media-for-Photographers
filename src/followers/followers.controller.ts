@@ -17,7 +17,7 @@ export class FollowersController {
     return res.status(HttpStatus.OK).json({
       message: rs.message,
       status: 200,
-      data: rs.data,
+      data: {},
     });
   }
 

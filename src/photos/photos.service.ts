@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { AlbumsService } from '../albums/albums.service';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { Photo } from './entities/photo.entity';
 import * as fs from 'fs';
+import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class PhotosService {
   constructor(
@@ -13,11 +18,16 @@ export class PhotosService {
     private readonly photosRepository: Repository<Photo>, // private readonly usersService: UsersService,
     private readonly albumsService: AlbumsService, // private readonly usersService: UsersService,
   ) {}
-  async create(user: User, albumId, data) {
+
+  public async savePhoto(photo: Photo): Promise<Photo> {
+    return await this.photosRepository.save(photo);
+  }
+
+  public async create(user: User, albumId, data) {
     try {
       const album = await this.albumsService.findById(albumId);
       if (!album) {
-        return new Error('album do not exist');
+        return new NotFoundException('album do not exist');
       }
       const photo = new Photo();
       photo.name = data.name;
@@ -26,21 +36,21 @@ export class PhotosService {
       photo.user = user;
       return await this.photosRepository.save(photo);
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
-  async findAll(user: User): Promise<Photo[]> {
+  public async findAll(user: User): Promise<Photo[]> {
     try {
       return await this.photosRepository.find({
         select: ['id', 'name', 'link'],
         where: { user: user },
       });
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
-  async findAllOfAlbum(albumId: string): Promise<Photo[]> {
+  public async findAllOfAlbum(albumId: string): Promise<Photo[]> {
     try {
       const album = await this.albumsService.findById(albumId);
       return await this.photosRepository.find({
@@ -48,21 +58,21 @@ export class PhotosService {
         where: { album: album },
       });
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   }
 
-  async findOne(id: string) {
+  public async findOne(id: string) {
     return await this.photosRepository.findOne({ id });
   }
 
-  async update(id: string, updatePhotoDto: UpdatePhotoDto) {
+  public async update(id: string, updatePhotoDto: UpdatePhotoDto) {
     const photo = await this.photosRepository.findOne({ id });
     photo.name = updatePhotoDto.name;
     return await this.photosRepository.save(photo);
   }
 
-  async remove(id: string) {
+  public async remove(id: string) {
     const photo = await this.photosRepository.findOne({ id });
     await fs.unlink(photo.link, (err) => {
       if (err) {
@@ -71,5 +81,12 @@ export class PhotosService {
       }
     });
     return await this.photosRepository.delete(photo.id);
+  }
+
+  public async getAllLikeOfPhoto(photoId: string) {
+    const likes = await this.photosRepository.findOne(photoId, {
+      relations: ['likes'],
+    });
+    return likes;
   }
 }

@@ -5,6 +5,8 @@ import {
   ConflictException,
   UnauthorizedException,
   NotFoundException,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,50 +20,37 @@ import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { Follower } from '../followers/entities/follower.entity';
+import { FollowersService } from 'src/followers/followers.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(Follower)
-    private readonly followerRepository: Repository<Follower>,
+    @Inject(forwardRef(() => FollowersService))
+    private readonly followerService: FollowersService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly mailerService: MailerService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  public async create(createUserDto: CreateUserDto) {
-    try {
-      return await this.userRepository.save(createUserDto);
-    } catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
-    }
-  }
-  public async findById(userId: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
-    return user;
+
+  public async saveUser(user: User): Promise<User> {
+    return await this.userRepository.save(user);
   }
 
-  public async findByEmail(email: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: {
-        email: email,
-      },
-    });
-    return user;
-  }
-  public async findByUsername(username: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: {
-        username: username,
-      },
-    });
-    return user;
+  public async findOneUser(filter: any): Promise<User> {
+    try {
+      const { id, email, username } = filter;
+      if (!id) {
+        const user = await this.userRepository.findOne({
+          where: [{ email }, { username }],
+        });
+        return user;
+      }
+      return await this.userRepository.findOne(id);
+    } catch (error) {
+      throw new NotFoundException('User Not Found In Database');
+    }
   }
 
   public async updateUser(
@@ -69,7 +58,7 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
   ): Promise<User> {
     try {
-      const user = await this.userRepository.findOne({ id: id });
+      const user = await this.findOneUser({ id: id });
       user.name = updateUserDto.name;
       user.email = updateUserDto.email;
       user.username = updateUserDto.username;
@@ -89,7 +78,7 @@ export class UsersService {
         user.password,
       );
 
-      if (!passwordIsValid == true) {
+      if (!passwordIsValid) {
         throw new HttpException(
           'Invalid Current Password',
           HttpStatus.BAD_REQUEST,
@@ -112,8 +101,12 @@ export class UsersService {
   // for register account
   public async register(createUserDto: CreateUserDto) {
     try {
-      const userByEmail = await this.findByEmail(createUserDto.email);
-      const userByUsername = await this.findByUsername(createUserDto.username);
+      const userByEmail = await this.findOneUser({
+        email: createUserDto.email,
+      });
+      const userByUsername = await this.findOneUser({
+        username: createUserDto.username,
+      });
 
       if (userByEmail) {
         throw new ConflictException('This email already existed!');
@@ -132,7 +125,8 @@ export class UsersService {
       console.log(confirmToken);
       const link = `localhost:3000/users/register/${confirmToken}`;
       this.sendMailConfirm(createUserDto, link);
-      return this.create(createUserDto);
+      const rs = await this.userRepository.save(createUserDto);
+      return { user: rs, tokenConfirmation: confirmToken };
     } catch (error) {
       throw error;
     }
@@ -140,7 +134,7 @@ export class UsersService {
   // for login route
   public async login(loginDto: LoginDto) {
     try {
-      const user = await this.findByEmail(loginDto.email);
+      const user = await this.findOneUser({ email: loginDto.email });
 
       if (!user) throw new NotFoundException('Wrong Email!');
 
@@ -187,8 +181,8 @@ export class UsersService {
       }
       const passwordRandom = Math.random().toString(36).slice(-8);
       user.password = bcrypt.hashSync(passwordRandom, 8);
-      this.sendMailForgotPassword(forgotPasswordDto.email, passwordRandom);
       await this.userRepository.save(user);
+      this.sendMailForgotPassword(forgotPasswordDto.email, passwordRandom);
       return {};
     } catch (error) {
       throw error;
@@ -243,16 +237,33 @@ export class UsersService {
       const { email } = this.jwtService.verify(token, {
         secret: this.configService.get<string>('SECRET_KEY_CONFIRM_EMAIL'),
       });
-      const user = await this.findByEmail(email);
+      const user = await this.findOneUser({ email: email });
       user.isConfirmed = true;
       // create follower with the same id with registered user
-      const follower = new Follower();
-      follower.id = user.id;
-      this.followerRepository.save(follower);
-
+      this.followerService.createById(user.id);
       return await this.userRepository.save(user);
     } catch (error) {
-      throw new UnauthorizedException(error);
+      throw error;
     }
+  }
+
+  public async getAllFollowers(user: User) {
+    try {
+      const rs = await this.userRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('User.followers', 'Follow')
+        .where('User.id = :id', { id: user.id })
+        .getOne();
+      return rs;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async getAllLikeOfUser(userId: string) {
+    const likes = this.userRepository.findOne(userId, {
+      relations: ['likes'],
+    });
+    return likes;
   }
 }

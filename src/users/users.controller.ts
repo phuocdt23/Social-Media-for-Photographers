@@ -27,7 +27,7 @@ export class UsersController {
   @Get()
   public async getUser(@Res() res, @Req() req) {
     try {
-      const user = await this.usersService.findById(req.user.id);
+      const user = await this.usersService.findOneUser({ id: req.user.id });
 
       if (!user) {
         throw new NotFoundException('User does not exist!');

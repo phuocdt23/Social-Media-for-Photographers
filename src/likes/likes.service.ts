@@ -4,16 +4,16 @@ import { Photo } from '../photos/entities/photo.entity';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Like } from './entities/like.entity';
+import { PhotosService } from 'src/photos/photos.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class LikesService {
   constructor(
     @InjectRepository(Like)
     private readonly likesRepository: Repository<Like>,
-    @InjectRepository(Photo)
-    private readonly photosRepository: Repository<Photo>,
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    private readonly photosService: PhotosService,
+    private readonly usersService: UsersService,
   ) {}
   public async like(photo: Photo, user: User) {
     const like = new Like();
@@ -24,17 +24,13 @@ export class LikesService {
     user.likes.push(like);
 
     await this.likesRepository.save(like);
-    this.usersRepository.save(user);
-    this.photosRepository.save(photo);
+    this.usersService.saveUser(user);
+    this.photosService.savePhoto(photo);
   }
   public async likePhoto(x: User, photoId: string) {
     try {
-      const photo = await this.photosRepository.findOne(photoId, {
-        relations: ['likes'],
-      });
-      const user = await this.usersRepository.findOne(x.id, {
-        relations: ['likes'],
-      });
+      const photo = await this.photosService.getAllLikeOfPhoto(photoId);
+      const user = await this.usersService.getAllLikeOfUser(x.id);
 
       if (!photo) {
         throw new NotFoundException(`Not Found Photo By This Id #${photoId}`);
@@ -76,18 +72,14 @@ export class LikesService {
     }
   }
   public async getLikedUser(photoId: string) {
-    const photo = await this.photosRepository.findOne(photoId, {
-      relations: ['likes'],
-    });
+    const photo = await this.photosService.getAllLikeOfPhoto(photoId);
     if (!photo) {
       throw new NotFoundException(`Not Found Photo By This Id #${photoId}`);
     }
     return { likes: photo.likes, numberOfLike: photo.likes.length };
   }
   public async getAll(user: User) {
-    const likes = await this.usersRepository.findOne(user.id, {
-      relations: ['likes'],
-    });
+    const likes = await this.usersService.getAllLikeOfUser(user.id);
     return likes.likes;
   }
 }
