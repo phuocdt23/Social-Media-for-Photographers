@@ -20,7 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { FollowersService } from 'src/followers/followers.service';
+import { FollowersService } from '../followers/followers.service';
 
 @Injectable()
 export class UsersService {

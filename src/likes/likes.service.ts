@@ -4,8 +4,8 @@ import { Photo } from '../photos/entities/photo.entity';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Like } from './entities/like.entity';
-import { PhotosService } from 'src/photos/photos.service';
-import { UsersService } from 'src/users/users.service';
+import { PhotosService } from '../photos/photos.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class LikesService {

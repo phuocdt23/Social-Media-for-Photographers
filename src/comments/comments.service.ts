@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
-import { PhotosService } from 'src/photos/photos.service';
+import { PhotosService } from '../photos/photos.service';
 
 @Injectable()
 export class CommentsService {

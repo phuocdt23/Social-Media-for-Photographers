@@ -129,7 +129,7 @@ describe('UserController (e2e)', () => {
 
     await app.init();
   });
-
+  console.log(app);
   //register
   it('[POST /users/register] Success: Created', async () => {
     console.log('register test');

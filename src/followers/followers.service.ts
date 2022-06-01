@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Follower } from './entities/follower.entity';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { Inject } from '@nestjs/common';
 import { forwardRef } from '@nestjs/common';
 
@@ -87,9 +87,34 @@ export class FollowersService {
   public async getAllFollowers(user: User) {
     try {
       const rs = await this.usersService.getAllFollowers(user);
+      const arrayUser = [];
+      rs.followers.forEach(async (value) => {
+        const user = await this.userRepository.findOne(value.id);
+        arrayUser.push({ username: user.username });
+      });
+      console.log(username);
+
       return {
-        followers: rs.followers,
-        numberOfYourFollower: rs.followers.length,
+        followers: rs,
+        numberOfYourFollower: rs.length,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async getAllFollowingUser(user: User) {
+    try {
+      const rs = await this.followerRepository.findOne(user.id, {
+        relations: ['users'],
+      });
+      const arrayUser = [];
+      rs.users.forEach((value) => {
+        arrayUser.push({ username: value.username });
+      });
+      return {
+        followingUser: arrayUser,
+        numberOfYourFollowing: arrayUser.length,
       };
     } catch (error) {
       throw error;
