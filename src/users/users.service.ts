@@ -225,11 +225,8 @@ export class UsersService {
           nameUser: user.name,
         },
       })
-      .then(() => {
-        console.log('User Registration: Send Mail Confirmation successfully!');
-      })
-      .catch(() => {
-        console.log('User Registration: Send Mail Confirmation Failed!');
+      .catch((error) => {
+        throw error;
       });
   }
   public async confirmEmailRegistration(token: string): Promise<User> {

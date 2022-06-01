@@ -3,27 +3,8 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { CreateUserDto } from '../src/users/dto/create-user.dto';
+// import { Connection } from 'typeorm';
 
-const data_test = {
-  user001: {
-    username: 'willBeChanged',
-    email: 'willBeChanged@gmail.com',
-    name: 'willBeChanged',
-    password: 'willbechanged',
-  },
-  confictUserName: {
-    username: 'willBeChanged',
-    email: 'whatSoEver@gmail.com',
-    name: 'willBeChanged',
-    password: 'willbechanged',
-  },
-  confictGmail: {
-    username: 'whatSoEver',
-    email: 'willBeChanged@gmail.com',
-    name: 'willBeChanged',
-    password: 'willbechanged',
-  },
-};
 //   user002: {
 //     username: 'user002',
 //     email: 'user002@gmail.com',
@@ -117,6 +98,26 @@ const data_test = {
 //     commentUpdate: 'Cute is not FoUND',
 //   },
 // };
+const data_test = {
+  user001: {
+    username: 'willBeChanged2',
+    email: 'willBeChanged2@gmail.com',
+    name: 'willBeChanged',
+    password: 'willbechanged',
+  },
+  confictUserName: {
+    username: 'willBeChanged',
+    email: 'whatSoEver@gmail.com',
+    name: 'willBeChanged',
+    password: 'willbechanged',
+  },
+  confictGmail: {
+    username: 'whatSoEver',
+    email: 'willBeChanged@gmail.com',
+    name: 'willBeChanged',
+    password: 'willbechanged',
+  },
+};
 describe('UserController (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
@@ -126,10 +127,9 @@ describe('UserController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
-
     await app.init();
   });
-  console.log(app);
+
   //register
   it('[POST /users/register] Success: Created', async () => {
     console.log('register test');
