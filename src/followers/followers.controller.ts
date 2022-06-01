@@ -1,5 +1,15 @@
-import { Controller, Get, HttpStatus, Param, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { FollowUserDto } from './dto/follow-user.dto';
 import { FollowersService } from './followers.service';
 
 @ApiTags('Follow')
@@ -28,16 +38,26 @@ export class FollowersController {
     });
   }
 
-  @Get(':username')
-  async create(@Param('username') username: string, @Req() req, @Res() res) {
+  @Post('followTo')
+  async create(@Body() followUserdto: FollowUserDto, @Req() req, @Res() res) {
     const rs = await this.followersService.followAndUnFollow(
-      username,
+      followUserdto.username,
       req.user,
     );
     return res.status(HttpStatus.OK).json({
       message: rs.message,
       status: 200,
       data: {},
+    });
+  }
+
+  @Get('newsFeed')
+  async newsFeet(@Req() req, @Res() res) {
+    const rs = await this.followersService.getPhotoOfFollowingUser(req.user);
+    return res.status(HttpStatus.OK).json({
+      message: `Success to Get Photo From Following User`,
+      status: 200,
+      data: rs,
     });
   }
 }

@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   forwardRef,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AlbumsService } from '../albums/albums.service';
 import { User } from '../users/entities/user.entity';
@@ -72,8 +73,11 @@ export class PhotosService {
     return await this.photosRepository.save(photo);
   }
 
-  public async remove(id: string) {
+  public async remove(id: string, user: User) {
     const photo = await this.photosRepository.findOne({ id });
+    if (photo.ownerId !== user.id) {
+      throw new UnauthorizedException('You are not owner of this photo!');
+    }
     await fs.unlink(photo.link, (err) => {
       if (err) {
         console.error(err);

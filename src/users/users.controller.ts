@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Body,
-  Put,
   Res,
   HttpStatus,
   NotFoundException,
@@ -10,6 +9,7 @@ import {
   Req,
   Post,
   Param,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -44,7 +44,7 @@ export class UsersController {
   }
   //need to review
   @ApiBearerAuth()
-  @Put()
+  @Patch()
   public async update(
     @Res() res,
     @Req() req,
@@ -96,7 +96,7 @@ export class UsersController {
   ) {
     const rs = await this.usersService.forgotPassword(forgotPasswordDto);
     return res.status(HttpStatus.OK).json({
-      message: 'Your new password has sent to your mail!',
+      message: `Your new password has sent to your mail(${forgotPasswordDto.email})!`,
       status: 200,
       data: rs,
     });
@@ -108,13 +108,12 @@ export class UsersController {
     @Req() req,
     @Res() res,
   ) {
-    console.log(req.user);
     const rs = await this.usersService.updatePassword(
       updatePasswordDto,
       req.user,
     );
     return res.status(HttpStatus.OK).json({
-      message: 'Your password was updated successfully!',
+      message: `Change Password Successfully!`,
       status: 200,
       data: rs,
     });

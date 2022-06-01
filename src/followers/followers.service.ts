@@ -15,11 +15,13 @@ export class FollowersService {
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
+
   public async createById(id: string) {
     const follower = new Follower();
     follower.id = id;
     return this.followerRepository.save(follower);
   }
+
   public async followAndUnFollow(username: string, user: User) {
     try {
       // logined user ==> followerId, user find by username ==> userId
@@ -116,6 +118,22 @@ export class FollowersService {
         followingUser: arrayUser,
         numberOfYourFollowing: arrayUser.length,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async getPhotoOfFollowingUser(user: User) {
+    try {
+      const rs = await this.followerRepository
+        .createQueryBuilder()
+        .innerJoinAndSelect('Follower.users', 'User')
+        .innerJoinAndSelect('User.photos', 'Photo')
+        .where('Follower.id = :id', { id: user.id })
+        .orderBy('Photo.createdAt', 'DESC')
+        .getOne();
+
+      return rs;
     } catch (error) {
       throw error;
     }

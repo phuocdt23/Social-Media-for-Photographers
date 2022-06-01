@@ -10,11 +10,13 @@ import {
 export class CreateUserDto {
   @ApiProperty({ example: 'user001' })
   @IsString()
+  @MinLength(6)
   @MaxLength(30)
   readonly name: string;
 
   @ApiProperty({ example: 'user001' })
   @IsString()
+  @MinLength(6)
   @MaxLength(40)
   readonly username: string;
 

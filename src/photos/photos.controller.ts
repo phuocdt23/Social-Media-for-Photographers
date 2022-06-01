@@ -10,6 +10,7 @@ import {
   Res,
   UploadedFile,
   Req,
+  HttpStatus,
 } from '@nestjs/common';
 import { Express } from 'express';
 import { PhotosService } from './photos.service';
@@ -59,36 +60,63 @@ export class PhotosController {
       link: file.path,
     };
     const rs = await this.photosService.create(req.user, albumId, data);
-    return res.json(rs);
+    return res.status(HttpStatus.OK).json({
+      message: 'Post Photo Successfully!',
+      status: 200,
+      data: rs,
+    });
   }
 
   @Get('/:albumId')
   public async findAllByAlbumId(@Param('albumId') albumId: string, @Res() res) {
     const rs = await this.photosService.findAllOfAlbum(albumId);
-    return res.json({ rs });
+    return res.status(HttpStatus.OK).json({
+      message: `Get All Photo Of Album Id #${albumId} Successfully!`,
+      status: 200,
+      data: rs,
+    });
   }
   @Get()
   public async findAll(@Req() req, @Res() res) {
     const rs = await this.photosService.findAll(req.user);
-    return res.json({ rs });
+    return res.status(HttpStatus.OK).json({
+      message: `Get All Photo Of An User Id #${req.user.id} Successfully!`,
+      status: 200,
+      data: rs,
+    });
   }
 
   @Get(':id')
   public async findOne(@Param('id') id: string, @Res() res) {
     const rs = await this.photosService.findOne(id);
-    return res.json({ rs });
+    return res.status(HttpStatus.OK).json({
+      message: `Get Photo Has Id #${id} Successfully!`,
+      status: 200,
+      data: rs,
+    });
   }
 
   @Patch(':id')
   public async update(
     @Param('id') id: string,
     @Body() updatePhotoDto: UpdatePhotoDto,
+    @Res() res,
   ) {
-    return await this.photosService.update(id, updatePhotoDto);
+    const rs = await this.photosService.update(id, updatePhotoDto);
+    return res.status(HttpStatus.OK).json({
+      message: `Change  Photo Has Id #${id} Successfully!`,
+      status: 200,
+      data: rs,
+    });
   }
 
   @Delete(':id')
-  public async remove(@Param('id') id: string) {
-    return await this.photosService.remove(id);
+  public async remove(@Param('id') id: string, @Req() req, @Res() res) {
+    const rs = await this.photosService.remove(id, req.user);
+    return res.status(HttpStatus.OK).json({
+      message: `Delete Photo Has Id #${id} Successfully!`,
+      status: 200,
+      data: rs,
+    });
   }
 }

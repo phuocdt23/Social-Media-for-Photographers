@@ -12,18 +12,24 @@ import { User } from '../../users/entities/user.entity';
 import { Album } from '../../albums/entities/album.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';
+import { IsUUID } from 'class-validator';
 @Entity({ name: 'Photo' })
 export class Photo {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
   @ApiProperty()
-  @Column({ nullable: false })
+  @Column()
   link: string;
+
+  @ApiProperty()
+  @Column()
+  @IsUUID()
+  ownerId: string;
 
   @ApiProperty()
   @Column({ default: true })
