@@ -88,15 +88,15 @@ export class FollowersService {
     try {
       const rs = await this.usersService.getAllFollowers(user);
       const arrayUser = [];
-      rs.followers.forEach(async (value) => {
-        const user = await this.userRepository.findOne(value.id);
+      for (const userId of rs.followers) {
+        const user = await this.usersService.findOneUser({ id: userId.id });
         arrayUser.push({ username: user.username });
-      });
-      console.log(username);
+      }
+      console.log(arrayUser);
 
       return {
-        followers: rs,
-        numberOfYourFollower: rs.length,
+        followers: arrayUser,
+        numberOfYourFollower: arrayUser.length,
       };
     } catch (error) {
       throw error;

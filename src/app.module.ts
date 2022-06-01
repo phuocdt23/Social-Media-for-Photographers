@@ -17,10 +17,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtVerifyMiddleware } from './middlewares/jwt-verify.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { LikesModule } from './likes/likes.module';
+import { configs } from './configs/db';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot(Object(configs.db)),
     UsersModule,
     AlbumsModule,
     CommentsModule,
