@@ -59,7 +59,7 @@ export class AppModule implements NestModule {
         'follows',
 
         { path: 'users/change-password', method: RequestMethod.POST },
-        { path: 'users', method: RequestMethod.PUT },
+        { path: 'users', method: RequestMethod.PATCH },
         { path: 'users', method: RequestMethod.GET },
       );
   }

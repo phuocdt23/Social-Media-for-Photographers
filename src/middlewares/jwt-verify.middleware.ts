@@ -18,9 +18,9 @@ export class JwtVerifyMiddleware implements NestMiddleware {
     try {
       console.log('middleware');
       if (!req.headers.authorization) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({
+        return res.status(HttpStatus.BAD_REQUEST).json({
           message: 'Please Login To Access Resource!(do not have token!)',
-          status: 401,
+          status: 400,
           data: {},
         });
       }

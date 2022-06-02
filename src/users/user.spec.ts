@@ -1,16 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../app.module';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { CreateUserDto } from '../src/users/dto/create-user.dto';
-import { LoginDto } from '../src/users/dto/login.dto';
-// import { Connection } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+// import { AppModule } from '../src/app.module';
+// import { CreateUserDto } from '../src/users/dto/create-user.dto';
+// import { LoginDto } from '../src/users/dto/login.dto';
+// import { UpdatePasswordDto } from '../src/users/dto/update-password.dto';
+// import { UpdateUserDto } from '../src/users/dto/update-user.dto';
 const users = [
   {
     username: 'user001',
     email: 'user001@gmail.com',
     name: 'user001',
-    password: '123123',
+    password: 'willbechange',
   },
   {
     username: 'user002',
@@ -61,19 +67,18 @@ const users = [
     password: '123123',
   },
   {
-    username: 'user010',
-    email: 'user010@gmail.com',
-    name: 'user010',
+    username: 'willbechanged',
+    email: 'willbechanged@gmail.com',
+    name: 'willbechanged',
     password: '123123',
   },
 ];
 
 const data_test = {
-  user001: {
-    username: 'user001',
-    email: 'user001@gmail.com',
-    name: 'user001',
-    password: '123123',
+  changedInfo: {
+    username: 'user010',
+    email: 'user010@gmail.com',
+    name: 'user010',
   },
   confictUserName: {
     username: 'user001',
@@ -86,6 +91,20 @@ const data_test = {
     email: 'user001@gmail.com',
     name: 'user001',
     password: '123123',
+  },
+  expiredToken: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidXNlcjAwMSIsImVtYWlsIjoidXNlcjAwMUBnbWFpbC5jb20iLCJpZCI6ImUzZjA5MDUwLTA5MGMtNDZiZi1hN2VjLWY5ODVhNjg4MGMzZCIsImlhdCI6MTY1NDE1MDU3NywiZXhwIjoxNjU0MTU0MTc3fQ.YH2grPzwejageFSr-I7iRFHn2FnyEc3xwR1G39YtWSg`,
+  invalidSignature: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidXNlcjAwMSIsImVtYWlsIjoidXNlcjAwMUBnbWFpbC5jb20iLCJpZCI6IjdhYWY0Yzg0LWY4NTQtNGM2OS1hZGQ4LTczNmNjMjBhYTFhZiIsImlhdCI6MTY1NDE1Mjg1OCwiZXhwIjoxNjU0MTU2NDU4fQ.hBW9RKRHvuK3ypjm5Oik4XxrNUjH2o6IHyiP6HKH8WW`,
+  successChangePassword: {
+    currentPassword: 'willbechange',
+    newPassword: '123123',
+  },
+  failNotChangePassword: {
+    currentPassword: '123123',
+    newPassword: '123123',
+  },
+  invalidCurrentPassword: {
+    currentPassword: 'wrongPassword',
+    newPassword: 'whatever!',
   },
 };
 describe('UserController (e2e)', () => {
@@ -100,6 +119,8 @@ describe('UserController (e2e)', () => {
     await app.init();
   });
   const accessToken = [];
+
+  //insert 10 users into database
   for (const user of users) {
     let token: string;
     //insert 10 users into data with confirmed email
@@ -129,7 +150,6 @@ describe('UserController (e2e)', () => {
       );
     });
   }
-  // console.log(accessToken);
 
   it('[POST /users/register] Fail: Confict Gmail', async () => {
     await request(app.getHttpServer())
@@ -137,12 +157,82 @@ describe('UserController (e2e)', () => {
       .send(data_test.confictGmail as CreateUserDto)
       .expect(409);
   });
-
   it('[POST /users/register] Fail: Confict Username', async () => {
     await request(app.getHttpServer())
       .post('/users/register')
       .send(data_test.confictUserName as CreateUserDto)
       .expect(409);
+  });
+  it('[GET /users] Success: Get Infor User', async () => {
+    await request(app.getHttpServer())
+      .get('/users')
+      .set({ authorization: `Bearer ${accessToken[0]}` })
+      .expect(200);
+  });
+  // it('[PATCH /users] Success: Change Infor User', async () => {
+  //   await request(app.getHttpServer())
+  //     .patch('/users')
+  //     .set({ authorization: `Bearer ${accessToken[accessToken.length - 1]}` })
+  //     .send(data_test.changedInfo as UpdateUserDto)
+  //     .expect({
+  //       message: 'Change Successfully!',
+  //       status: 200,
+  //     });
+  // })
+  it('[POST /users/change-password] Fail: Invalid Current Password', async () => {
+    await request(app.getHttpServer())
+      .post('/users/change-password')
+      .set({ authorization: `Bearer ${accessToken[0]}` })
+      .send(data_test.invalidCurrentPassword as UpdatePasswordDto)
+      .expect(400);
+  });
+  it('[Post /users/change-password] Fail: The New Password The Same As Old Password', async () => {
+    const rs = await request(app.getHttpServer())
+      .post('/users/change-password')
+      .set({ authorization: `Bearer ${accessToken[0]}` })
+      .send(data_test.failNotChangePassword as UpdatePasswordDto)
+      .expect(400);
+  });
+  // it('[Post /users/change-password] Success: Change Password', async () => {
+  //   const rs = await request(app.getHttpServer())
+  //     .patch('/users/change-password')
+  //     .set({ authorization: `Bearer ${accessToken[0]}` })
+  //     .send(data_test.successChangePassword as UpdatePasswordDto)
+  //     .expect(200);
+  //   console.log(`rs:`, rs);
+  // })
+
+  //Test for jwt-middleware
+  it('[GET /users] Fail: Jwt Malformed', async () => {
+    await request(app.getHttpServer())
+      .get('/users')
+      .set({ authorization: `Bearer abcxyz` })
+      .expect({
+        name: 'JsonWebTokenError',
+        message: 'jwt malformed',
+      });
+  });
+  it('[GET /users] Fail: Invalid Signature', async () => {
+    await request(app.getHttpServer())
+      .get('/users')
+      .set({ authorization: `Bearer ${data_test.invalidSignature}` })
+      .expect({
+        name: 'JsonWebTokenError',
+        message: 'invalid signature',
+      });
+  });
+  it('[GET /users] Fail: Do Not Have Token', async () => {
+    await request(app.getHttpServer()).get('/users').expect({
+      message: 'Please Login To Access Resource!(do not have token!)',
+      status: 400,
+      data: {},
+    });
+  });
+  it('[GET /users] Fail: Expired Token', async () => {
+    await request(app.getHttpServer())
+      .get('/users')
+      .set({ authorization: `Bearer ${data_test.expiredToken}` })
+      .expect(401);
   });
 });
 // let app: INestApplication;

@@ -26,21 +26,13 @@ export class UsersController {
   @ApiBearerAuth()
   @Get()
   public async getUser(@Res() res, @Req() req) {
-    try {
-      const user = await this.usersService.findOneUser({ id: req.user.id });
+    const user = await this.usersService.findOneUser({ id: req.user.id });
 
-      if (!user) {
-        throw new NotFoundException('User does not exist!');
-      }
-
-      return res.status(HttpStatus.OK).json({
-        message: 'Get Info Successfully!',
-        status: 200,
-        data: user,
-      });
-    } catch (error) {
-      throw new UnauthorizedException(error);
-    }
+    return res.status(HttpStatus.OK).json({
+      message: 'Get Info Successfully!',
+      status: 200,
+      data: user,
+    });
   }
   //need to review
   @ApiBearerAuth()
@@ -50,14 +42,11 @@ export class UsersController {
     @Req() req,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const result = await this.usersService.updateUser(
-      req.user.id,
-      updateUserDto,
-    );
+    const rs = await this.usersService.updateUser(req.user.id, updateUserDto);
     return res.status(HttpStatus.OK).json({
       message: 'Change Successfully!',
       status: 200,
-      data: result,
+      data: rs,
     });
   }
   @Post('register')
