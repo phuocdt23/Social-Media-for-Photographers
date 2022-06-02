@@ -122,7 +122,7 @@ export class UsersService {
       const confirmToken = this.jwtService.sign(payload, {
         secret: this.configService.get<string>('SECRET_KEY_CONFIRM_EMAIL'),
       });
-      console.log(confirmToken);
+      // console.log(confirmToken);
       const link = `localhost:3000/users/register/${confirmToken}`;
       this.sendMailConfirm(createUserDto, link);
       const rs = await this.userRepository.save(createUserDto);

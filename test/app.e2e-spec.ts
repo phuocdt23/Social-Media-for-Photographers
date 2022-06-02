@@ -3,119 +3,89 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { CreateUserDto } from '../src/users/dto/create-user.dto';
+import { LoginDto } from '../src/users/dto/login.dto';
 // import { Connection } from 'typeorm';
+const users = [
+  {
+    username: 'user001',
+    email: 'user001@gmail.com',
+    name: 'user001',
+    password: '123123',
+  },
+  {
+    username: 'user002',
+    email: 'user002@gmail.com',
+    name: 'user002',
+    password: '123123',
+  },
+  {
+    username: 'user003',
+    email: 'user003@gmail.com',
+    name: 'user003',
+    password: '123123',
+  },
+  {
+    username: 'user004',
+    email: 'user004@gmail.com',
+    name: 'user004',
+    password: '123123',
+  },
+  {
+    username: 'user005',
+    email: 'user005@gmail.com',
+    name: 'user005',
+    password: '123123',
+  },
+  {
+    username: 'user006',
+    email: 'user006@gmail.com',
+    name: 'user006',
+    password: '123123',
+  },
+  {
+    username: 'user007',
+    email: 'user007@gmail.com',
+    name: 'user007',
+    password: '123123',
+  },
+  {
+    username: 'user008',
+    email: 'user008@gmail.com',
+    name: 'user008',
+    password: '123123',
+  },
+  {
+    username: 'user009',
+    email: 'user009@gmail.com',
+    name: 'user009',
+    password: '123123',
+  },
+  {
+    username: 'user010',
+    email: 'user010@gmail.com',
+    name: 'user010',
+    password: '123123',
+  },
+];
 
-//   user002: {
-//     username: 'user002',
-//     email: 'user002@gmail.com',
-//     name: 'user002',
-//     password: '123123',
-//   },
-//   user003: {
-//     username: 'user003',
-//     email: 'user003@gmail.com',
-//     name: 'user003',
-//     password: '123123',
-//   },
-//   user004: {
-//     username: 'user004',
-//     email: 'user004@gmail.com',
-//     name: 'user004',
-//     password: '123123',
-//   },
-//   user005: {
-//     username: 'user005',
-//     email: 'user005@gmail.com',
-//     name: 'user005',
-//     password: '123123',
-//   },
-//   user006: {
-//     username: 'user006',
-//     email: 'user006@gmail.com',
-//     name: 'user006',
-//     password: '123123',
-//   },
-//   user007: {
-//     username: 'user007',
-//     email: 'user007@gmail.com',
-//     name: 'user007',
-//     password: '123123',
-//   },
-//   user008: {
-//     username: 'user008',
-//     email: 'user008@gmail.com',
-//     name: 'user008',
-//     password: '123123',
-//   },
-//   user009: {
-//     username: 'user009',
-//     email: 'user009@gmail.com',
-//     name: 'user009',
-//     password: '123123',
-//   },
-//   user010: {
-//     username: 'user010',
-//     email: 'user010@gmail.com',
-//     name: 'user010',
-//     password: '123123',
-//   },
-
-//   userUpdate1: {
-//     username: 'user001',
-//     email: 'user001@gmail.com',
-//     name: 'user001'
-//   },
-
-//   userChangePassword1: {
-//     currentPassword: 'willbechanged',
-//     newPassword: '123123',
-//   },
-
-//   album1: {
-//     name: 'willBeChangeName1',
-//     description: 'will Be Change Description 1',
-//   },
-
-//   albumUpdate: {
-//     name: `user001's Album1`,
-//     description: `user001's description1`,
-//   },
-
-//   photo: {
-//     name: 'Mua he chuyen lanh',
-//   },
-
-//   photoUpdate: {
-//     caption: 'Mot ngay hai ngay ba ngay',
-//     status: 'Private',
-//   },
-
-//   comments: {
-//     comment: 'Anh nay dep dep',
-//   },
-
-//   commentUpdates: {
-//     commentUpdate: 'Cute is not FoUND',
-//   },
-// };
 const data_test = {
   user001: {
-    username: 'willBeChanged2',
-    email: 'willBeChanged2@gmail.com',
-    name: 'willBeChanged',
-    password: 'willbechanged',
+    username: 'user001',
+    email: 'user001@gmail.com',
+    name: 'user001',
+    password: '123123',
   },
   confictUserName: {
-    username: 'willBeChanged',
+    username: 'user001',
     email: 'whatSoEver@gmail.com',
-    name: 'willBeChanged',
-    password: 'willbechanged',
+    name: 'user001',
+    password: '123123',
   },
   confictGmail: {
     username: 'whatSoEver',
-    email: 'willBeChanged@gmail.com',
-    name: 'willBeChanged',
-    password: 'willbechanged',
+    email: 'user001@gmail.com',
+    name: 'user001',
+    password: '123123',
   },
 };
 describe('UserController (e2e)', () => {
@@ -129,20 +99,42 @@ describe('UserController (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
+  const accessToken = [];
+  for (const user of users) {
+    let token: string;
+    //insert 10 users into data with confirmed email
+    it('[POST /users/register] Success: Created', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/users/register')
+        .send(user as CreateUserDto)
+        .expect(201);
+      token = response.body.data.tokenConfirmation;
+    });
 
-  //register
-  it('[POST /users/register] Success: Created', async () => {
-    console.log('register test');
-    const response = await request(app.getHttpServer())
-      .post('/users/register')
-      .send(data_test.user001 as CreateUserDto)
-      .expect(201);
-  });
+    it('[GET /users/register/:token] Success: Register', async () => {
+      await request(app.getHttpServer())
+        .get('/users/register/' + token)
+        .expect(200);
+    });
+
+    it('[POST /users/login] Success: Login', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/users/login')
+        .send({ email: user.email, password: user.password } as LoginDto)
+        .expect(200);
+      accessToken.push(res.body.data.accessToken);
+      console.log(
+        `access token user00${accessToken.length}: `,
+        res.body.data.accessToken,
+      );
+    });
+  }
+  // console.log(accessToken);
 
   it('[POST /users/register] Fail: Confict Gmail', async () => {
     await request(app.getHttpServer())
       .post('/users/register')
-      .send(data_test.user001 as CreateUserDto)
+      .send(data_test.confictGmail as CreateUserDto)
       .expect(409);
   });
 
