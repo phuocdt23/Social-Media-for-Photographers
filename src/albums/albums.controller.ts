@@ -41,7 +41,7 @@ export class AlbumsController {
     @Req() req,
     @Res() res,
   ) {
-    const rs = this.albumsService.invite(inviteToAlbum);
+    const rs = await this.albumsService.invite(inviteToAlbum);
     return res.status(HttpStatus.OK).json({
       message:
         'Invite To Album Successfully! (Sending mail to user successfully)',

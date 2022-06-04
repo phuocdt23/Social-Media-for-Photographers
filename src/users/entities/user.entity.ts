@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   ManyToMany,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
 import { Photo } from '../../photos/entities/photo.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Like } from '../../likes/entities/like.entity';

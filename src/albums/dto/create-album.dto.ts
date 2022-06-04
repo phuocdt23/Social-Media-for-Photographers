@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MaxLength, IsNotEmpty, IsEmail, IsString } from 'class-validator';
+import { MaxLength, IsNotEmpty, IsString } from 'class-validator';
 export class CreateAlbumDto {
   @ApiProperty({ example: 'album1' })
   @IsString()

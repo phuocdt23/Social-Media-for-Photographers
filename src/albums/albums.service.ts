@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -56,7 +55,7 @@ export class AlbumsService {
     try {
       return await this.albumsRepository.findOne(id, { relations: ['users'] });
     } catch (error) {
-      throw error;
+      throw new NotFoundException(error, 'Album does not exist!');
     }
   }
   public async findById(id: string): Promise<Album> {
@@ -97,24 +96,21 @@ export class AlbumsService {
   public async invite(inviteToAlbum) {
     try {
       const user = await this.usersService.findOneUser({
-        email: inviteToAlbum.email,
+        username: inviteToAlbum.username,
       });
       const album = await this.findOne(inviteToAlbum.albumId);
       if (!user) {
-        return new NotFoundException('User email not found!');
+        throw new NotFoundException('Username does not exist!');
       }
-      if (!album) {
-        return new NotFoundException('Email does not exist!');
-      }
+
       const payload = {
-        email: inviteToAlbum.email,
-        albumId: inviteToAlbum.albumId,
+        username: inviteToAlbum.username,
+        albumId: album.id,
       };
       const inviteToken = this.jwtService.sign(payload);
-      console.log(inviteToken);
       const link = `localhost:3000/albums/handleInviation/${inviteToken}`;
-      const rs = this.sendMailInvite(inviteToAlbum, link);
-      return rs;
+      this.sendMailInvite(inviteToAlbum, link);
+      return { inviteToken: inviteToken };
     } catch (error) {
       throw error;
     }
@@ -155,8 +151,8 @@ export class AlbumsService {
   }
   public async handleInvitation(token: string) {
     try {
-      const { email, albumId } = this.jwtService.verify(token);
-      const user = await this.usersService.findOneUser({ email: email });
+      const { username, albumId } = this.jwtService.verify(token);
+      const user = await this.usersService.findOneUser({ username: username });
 
       const album = await this.findOne(albumId);
       album.users.push(user);
